@@ -1,10 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { TreeModule } from 'primeng/tree';
+import { TreeNodeSelectEvent } from 'primeng/types/tree';
 import { ButtonModule } from 'primeng/button';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MenuItem, TreeNode } from 'primeng/api';
 import { NodeTreeStore } from '../../core/state/node-tree.store';
 import { CaffeineNode, NodeType } from '../../core/models/node.model';
+import { EditorSessionStore } from '../../core/state/editor-session.store';
+
+const OPENABLE_NODE_TYPES = new Set([NodeType.Document, NodeType.Chapter]);
 
 @Component({
   selector: 'app-project-tree',
@@ -15,8 +19,16 @@ import { CaffeineNode, NodeType } from '../../core/models/node.model';
 })
 export class ProjectTreeComponent implements OnInit {
   protected readonly store = inject(NodeTreeStore);
+  private readonly editorSession = inject(EditorSessionStore);
 
   protected selectedNode: TreeNode<CaffeineNode> | null = null;
+
+  protected onNodeSelect(event: TreeNodeSelectEvent): void {
+    const node = (event.node as TreeNode<CaffeineNode>).data;
+    if (node && OPENABLE_NODE_TYPES.has(node.nodeType)) {
+      this.editorSession.open(node.id);
+    }
+  }
 
   protected readonly contextMenuItems: MenuItem[] = [
     { label: 'Nova pasta', icon: 'pi pi-folder', command: () => this.createChild(NodeType.Folder) },

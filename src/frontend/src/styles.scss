@@ -5,3 +5,8 @@ html, body {
   height: 100%;
   margin: 0;
 }
+
+.editor__content .tiptap {
+  min-height: 100%;
+  outline: none;
+}

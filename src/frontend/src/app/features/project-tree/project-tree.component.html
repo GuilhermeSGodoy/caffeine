@@ -9,6 +9,7 @@
     selectionMode="single"
     [(selection)]="selectedNode"
     [contextMenu]="menu"
+    (onNodeSelect)="onNodeSelect($event)"
     class="project-tree__tree"
   />
 

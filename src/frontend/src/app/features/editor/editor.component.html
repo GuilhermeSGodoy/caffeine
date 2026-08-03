@@ -1,0 +1,20 @@
+<div class="editor">
+  @if (store.openNodeId()) {
+    <div class="editor__status">
+      <span>{{ store.wordCount() }} palavras · {{ store.charCount() }} caracteres</span>
+      <span class="editor__save-status">
+        @if (store.saving()) {
+          Salvando...
+        } @else if (store.dirty()) {
+          Alterações não salvas
+        } @else {
+          Salvo
+        }
+      </span>
+    </div>
+  } @else {
+    <div class="editor__placeholder">Selecione um documento ou capítulo na árvore para começar a escrever.</div>
+  }
+
+  <div #editorHost class="editor__content"></div>
+</div>
