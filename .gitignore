@@ -1,0 +1,31 @@
+# .NET
+[Bb]in/
+[Oo]bj/
+*.user
+
+# Node / Angular / Electron
+node_modules/
+dist/
+.angular/
+out/
+release/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local

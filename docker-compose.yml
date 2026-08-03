@@ -1,0 +1,22 @@
+# Docker é dispensável para o desenvolvimento local nesta fase: o banco é um
+# arquivo SQLite local (sem serviço de banco para containerizar) e o backend
+# ASP.NET Core tem hot-reload mais simples rodando nativo via `dotnet watch run`
+# (ver scripts/dev-backend.ps1). Este arquivo fica versionado como esqueleto
+# para quando fases futuras (ex: sincronização na nuvem, banco relacional
+# compartilhado) justificarem containerizar o backend em dev.
+#
+# services:
+#   backend:
+#     build:
+#       context: ./src/backend
+#       dockerfile: Caffeine.Api/Dockerfile
+#     ports:
+#       - "5000:5000"
+#     environment:
+#       - CAFFEINE_API_URL=http://0.0.0.0:5000
+#       - CAFFEINE_DATA_DIR=/data
+#     volumes:
+#       - caffeine-data:/data
+#
+# volumes:
+#   caffeine-data:

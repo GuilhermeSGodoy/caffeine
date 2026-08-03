@@ -56,3 +56,24 @@
 5. Histórico de versões
 6. Internacionalização (a princípio tendo apenas português e inglês)
 7. Exportação para outros formatos além de PDF (EPUB, Markdown, HTML etc)
+
+## Desenvolvimento local
+
+Requisitos: .NET SDK 10, Node.js 22+, npm.
+
+Rodar cada parte em um terminal separado (na raiz do repositório):
+
+```powershell
+./scripts/dev-backend.ps1   # API .NET em http://127.0.0.1:5000, hot-reload via dotnet watch
+./scripts/dev-frontend.ps1  # Angular em http://localhost:4200, hot-reload via ng serve
+./scripts/dev-electron.ps1  # opcional: abre a UI dentro do shell Electron
+```
+
+Testes:
+
+```powershell
+dotnet test src/backend/Caffeine.sln
+cd src/frontend && npx ng test --watch=false
+```
+
+O banco SQLite de desenvolvimento fica em `.devdata/caffeine.db` (ignorado pelo Git).

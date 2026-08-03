@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Caffeine.Api/Caffeine.Api.csproj" />
+  <Project Path="Caffeine.Domain/Caffeine.Domain.csproj" />
+  <Project Path="Caffeine.Infrastructure/Caffeine.Infrastructure.csproj" />
+  <Project Path="Caffeine.Tests/Caffeine.Tests.csproj" />
+</Solution>

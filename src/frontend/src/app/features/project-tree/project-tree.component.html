@@ -1,0 +1,16 @@
+<div class="project-tree">
+  <div class="project-tree__toolbar">
+    <span>Projetos</span>
+    <p-button icon="pi pi-plus" size="small" severity="secondary" [text]="true" (onClick)="createRootFolder()" />
+  </div>
+
+  <p-tree
+    [value]="store.treeNodes()"
+    selectionMode="single"
+    [(selection)]="selectedNode"
+    [contextMenu]="menu"
+    class="project-tree__tree"
+  />
+
+  <p-contextMenu #menu [model]="contextMenuItems" />
+</div>
