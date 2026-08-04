@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { TreeNode } from 'primeng/api';
 import { NodeApiService } from '../services/node-api.service';
 import { CaffeineNode, NodeType } from '../models/node.model';
@@ -35,14 +36,18 @@ export class NodeTreeStore {
     });
   }
 
-  createNode(parentId: string | null, nodeType: NodeType, title: string) {
-    this.api.create({ parentId, nodeType, title }).subscribe(() => this.load());
+  createNode(parentId: string | null, nodeType: NodeType, title: string, onError?: (message: string) => void) {
+    this.api.create({ parentId, nodeType, title }).subscribe({
+      next: () => this.load(),
+      error: (err: HttpErrorResponse) => onError?.(this.extractErrorMessage(err))
+    });
   }
 
-  renameNode(node: CaffeineNode, title: string) {
-    this.api
-      .update(node.id, { title, sortOrder: node.sortOrder, parentId: node.parentId })
-      .subscribe(() => this.load());
+  renameNode(node: CaffeineNode, title: string, onError?: (message: string) => void) {
+    this.api.update(node.id, { title, sortOrder: node.sortOrder, parentId: node.parentId }).subscribe({
+      next: () => this.load(),
+      error: (err: HttpErrorResponse) => onError?.(this.extractErrorMessage(err))
+    });
   }
 
   moveNode(node: CaffeineNode, newParentId: string | null) {
@@ -54,6 +59,10 @@ export class NodeTreeStore {
   deleteNode(id: string) {
     this.setExpanded(id, false);
     this.api.delete(id).subscribe(() => this.load());
+  }
+
+  private extractErrorMessage(err: HttpErrorResponse): string {
+    return typeof err.error === 'string' ? err.error : 'Não foi possível completar a operação.';
   }
 
   private buildTree(nodes: CaffeineNode[]): TreeNode<CaffeineNode>[] {

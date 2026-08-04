@@ -37,4 +37,26 @@ describe('NodeTreeStore', () => {
     expect(store.treeNodes()[0].expanded).toBe(true);
     expect(store.treeNodes()[0].children?.length).toBe(2);
   });
+
+  it('notifica erro ao criar nó com nome duplicado, sem recarregar a árvore', () => {
+    const onError = vi.fn();
+
+    store.createNode(folder.id, NodeType.Chapter, document.title, onError);
+    http
+      .expectOne(`${API_BASE_URL}/nodes`)
+      .flush('Já existe um item com esse nome nesta pasta.', { status: 400, statusText: 'Bad Request' });
+
+    expect(onError).toHaveBeenCalledWith('Já existe um item com esse nome nesta pasta.');
+  });
+
+  it('notifica erro ao renomear nó com nome duplicado, sem recarregar a árvore', () => {
+    const onError = vi.fn();
+
+    store.renameNode(document, folder.title, onError);
+    http
+      .expectOne(`${API_BASE_URL}/nodes/${document.id}`)
+      .flush('Já existe um item com esse nome nesta pasta.', { status: 400, statusText: 'Bad Request' });
+
+    expect(onError).toHaveBeenCalledWith('Já existe um item com esse nome nesta pasta.');
+  });
 });
