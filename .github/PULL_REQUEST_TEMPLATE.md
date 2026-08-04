@@ -1,4 +1,4 @@
-## Issue relacionada
+# Issue relacionada
 
 Closes #<!-- número da issue -->
 
@@ -20,4 +20,4 @@ Closes #<!-- número da issue -->
 
 ## Merge
 
-Este PR deve ser fechado com **squash merge**, com a mensagem de commit final no padrão `<tipo>: <descrição> [#<numero-da-issue>]` (ex.: `feat: adiciona busca e substituição de texto [#12]`) — não usar a mensagem default gerada pelo GitHub sem ajustar.
+Este PR deve ser fechado com um **merge normal** (merge commit, preservando os commits individuais da branch) — não usar squash merge nem rebase merge.
