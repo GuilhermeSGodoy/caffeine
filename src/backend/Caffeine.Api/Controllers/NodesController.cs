@@ -35,6 +35,12 @@ public class NodesController(INodeRepository repository) : ControllerBase
             return BadRequest($"Um nó do tipo {request.NodeType} não pode ser criado sob um nó do tipo {parentType}.");
         }
 
+        var siblings = await repository.GetTreeAsync(cancellationToken);
+        if (NodeTreeValidator.IsDuplicateSiblingName(null, request.ParentId, request.Title, siblings))
+        {
+            return BadRequest("Já existe um item com esse nome nesta pasta.");
+        }
+
         var node = new Node
         {
             Id = Guid.NewGuid(),
@@ -62,10 +68,14 @@ public class NodesController(INodeRepository repository) : ControllerBase
             return NotFound();
         }
 
+        var allNodes = await repository.GetTreeAsync(cancellationToken);
+        if (NodeTreeValidator.IsDuplicateSiblingName(id, request.ParentId, request.Title, allNodes))
+        {
+            return BadRequest("Já existe um item com esse nome nesta pasta.");
+        }
+
         if (request.ParentId != node.ParentId)
         {
-            var allNodes = await repository.GetTreeAsync(cancellationToken);
-
             if (!NodeTreeValidator.CanMove(id, request.ParentId, allNodes))
             {
                 return BadRequest("Não é possível mover um nó para dentro dele mesmo ou de seus descendentes.");
