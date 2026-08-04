@@ -19,43 +19,75 @@
 
 ## Requisitos do Projeto
 
+Legenda de status: 🟢 Concluído · 🟡 Em andamento · ⚪ Não iniciado
+
 ### Fase 1
 
-1. Criar/editar/deletar documentos
-2. Escolha de diferentes temas de cores
-3. Criar/editar/deletar sub abas/capítulos em um projeto/documento
-4. Criar/editar/deletar comentários ao longo do texto (incluindo comentários internos)
-5. Criar/editar/deletar pastas para diferentes projetos, com seus próprios arquivos internos ou diretórios
-6. Auto-save a cada x segundos
-7. Busca e substituição de texto (com regex opcional)
-8. Contador de palavras/caracteres em tempo real
-9. Atalhos de teclado (Ctrl + B, Ctrl + S, Ctrl + P etc)
-10. Modo leitura/preview
-11. Tags/labels para organizar documentos/diretórios (definidas pelo usuário, com título e cor)
-12. Importação de arquivos (.txt, .md, .docx)
-13. Exportação em PDF básica (formato A4), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
-14. Índice inteligente (em formato de menu lateral)
+1. 🟢 Criar/editar/deletar documentos
+   - CRUD completo via árvore lateral (criar, renomear, excluir com cascade) + edição de conteúdo via editor Tiptap.
+   - Pendente: mover documentos entre pastas pela UI (drag-and-drop) — hoje só é possível via chamada direta à API (`PUT /api/nodes/{id}`); a validação de regras de movimentação já existe no backend.
+2. ⚪ Escolha de diferentes temas de cores
+   - Só o preset padrão do PrimeNG (Aura) está configurado; não há seletor de tema nem persistência da preferência do usuário.
+3. 🟢 Criar/editar/deletar sub abas/capítulos em um projeto/documento
+   - Mesma base de CRUD de nós, com validação de hierarquia (capítulo só pode estar sob documento ou outro capítulo).
+4. ⚪ Criar/editar/deletar comentários ao longo do texto (incluindo comentários internos)
+   - Modelagem de dados já desenhada na arquitetura (`Comment` ancorado via mark do Tiptap), mas ainda não implementada.
+5. 🟢 Criar/editar/deletar pastas para diferentes projetos, com seus próprios arquivos internos ou diretórios
+6. 🟡 Auto-save a cada x segundos
+   - Implementado com debounce fixo de 3 segundos + salvamento manual (`Ctrl+S`).
+   - Pendente: tornar o intervalo configurável pelo usuário (hoje é fixo no código).
+7. ⚪ Busca e substituição de texto (com regex opcional)
+8. 🟡 Contador de palavras/caracteres em tempo real
+   - Backend calcula e persiste a contagem a cada salvamento; frontend exibe o valor retornado.
+   - Gap identificado na validação: a contagem só atualiza após o auto-save (a cada ~3s) ou `Ctrl+S`, não a cada tecla digitada — não é "tempo real" de fato ainda. Próximo passo: calcular a contagem no cliente a cada alteração do editor e reconciliar com o valor do backend após salvar.
+9. 🟡 Atalhos de teclado (Ctrl + B, Ctrl + S, Ctrl + P etc)
+   - `Ctrl+S` implementado (força salvamento). `Ctrl+B`/`Ctrl+I` (negrito/itálico) já vêm de série do StarterKit do Tiptap.
+   - Pendente: `Ctrl+P` e demais atalhos do produto; painel de ajuda/listagem de atalhos.
+10. ⚪ Modo leitura/preview
+11. ⚪ Tags/labels para organizar documentos/diretórios (definidas pelo usuário, com título e cor)
+    - Modelagem (`Tag`/`NodeTag`) já prevista na arquitetura, ainda não implementada.
+12. ⚪ Importação de arquivos (.txt, .md, .docx)
+13. ⚪ Exportação em PDF básica (formato A4), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
+    - Pacote QuestPDF já instalado no backend; lógica de exportação ainda não escrita.
+14. 🟡 Índice inteligente (em formato de menu lateral)
+    - A árvore lateral já reflete pastas/documentos/capítulos com CRUD via menu de contexto.
+    - Pendente: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo).
+
+**Bugs Identificados:**
+
+- Ao criar um novo documento ou capítulo, o conteúdo da pasta no menu lateral é recolhido
+
+**Demandas adicionais identificadas durante o desenvolvimento/validação (fora da lista original):**
+
+- UX das ações de criar/renomear/excluir na árvore hoje usa `window.prompt`/`window.confirm` do navegador como placeholder — precisa ser substituído por diálogos do PrimeNG (`p-dialog`) antes de considerar a Fase 1 pronta para uso real.
+- Bundle inicial do frontend passou do orçamento padrão do Angular (500kB) por causa do PrimeNG + Tiptap; o limite foi ajustado para 2MB em `angular.json` como solução temporária — vale revisitar com lazy loading de features antes de ir para produção.
+- A janela do Electron não pôde ser validada visualmente durante o desenvolvimento (ambiente headless usado para implementar); validar manualmente com `./scripts/dev-electron.ps1`.
+- Interface para visualização de projetos e documentos, além do menu lateral.
 
 ### Fase 2
 
-1. Paginação em diferentes formatos conforme escolha do usuário (A4 por padrão, ebook, outros formatos populares, customização por parte do usuário, incluindo margens, espaçamento de linhas, parágrafos etc)
-2. Estilos de formatação de texto padrão (cabeçalho, títulos, sub títulos, texto, citações etc) com diferentes possiblidades de fontes, tamanhos, cores, estilos de destaque, espaçamentos etc
-3. Criar/editar/deletar estilos de formatação de texto (cabeçalho, títulos, sub títulos, texto, citações etc) com diferentes possiblidades de fontes, tamanhos, cores, estilos de destaque, espaçamentos etc
-4. Possibilidade de usar Markdown para escrita do texto (configuração definida pelo usuário, aproveitando os estilos de formatação padrão ou customizados)
-5. Criar/editar/deletar templates de documento (incluindo formatação das páginas, margens e estilo de textos para capa, títulos, sub títulos, texto etc)
-6. Estatísticas gerais: palavras no documento, por capítulo/sub aba, tempo gasto, progresso dos dias em que o documento foi acessado
-7. Exportação em PDF (complementando o formato A4, ebook ou outros formatos convenientes), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
-8. Índice inteligente interno do documento, gerado automaticamente
+Todos os itens ⚪ **Não iniciado**.
+
+1. ⚪ Paginação em diferentes formatos conforme escolha do usuário (A4 por padrão, ebook, outros formatos populares, customização por parte do usuário, incluindo margens, espaçamento de linhas, parágrafos etc)
+2. ⚪ Estilos de formatação de texto padrão (cabeçalho, títulos, sub títulos, texto, citações etc) com diferentes possiblidades de fontes, tamanhos, cores, estilos de destaque, espaçamentos etc
+3. ⚪ Criar/editar/deletar estilos de formatação de texto (cabeçalho, títulos, sub títulos, texto, citações etc) com diferentes possiblidades de fontes, tamanhos, cores, estilos de destaque, espaçamentos etc
+4. ⚪ Possibilidade de usar Markdown para escrita do texto (configuração definida pelo usuário, aproveitando os estilos de formatação padrão ou customizados)
+5. ⚪ Criar/editar/deletar templates de documento (incluindo formatação das páginas, margens e estilo de textos para capa, títulos, sub títulos, texto etc)
+6. ⚪ Estatísticas gerais: palavras no documento, por capítulo/sub aba, tempo gasto, progresso dos dias em que o documento foi acessado
+7. ⚪ Exportação em PDF (complementando o formato A4, ebook ou outros formatos convenientes), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
+8. ⚪ Índice inteligente interno do documento, gerado automaticamente
 
 ### Fase 3
 
-1. Modo foco com timer
-2. Snippets/blocos reutilizáveis/dicionários de termos comuns/recorrentes (exemplos: termos técnicos, nomes de personagens etc)
-3. Backup automático periódico
-4. Análise de gramática/ortografia (com uso de API externa)
-5. Histórico de versões
-6. Internacionalização (a princípio tendo apenas português e inglês)
-7. Exportação para outros formatos além de PDF (EPUB, Markdown, HTML etc)
+Todos os itens ⚪ **Não iniciado**.
+
+1. ⚪ Modo foco com timer
+2. ⚪ Snippets/blocos reutilizáveis/dicionários de termos comuns/recorrentes (exemplos: termos técnicos, nomes de personagens etc)
+3. ⚪ Backup automático periódico
+4. ⚪ Análise de gramática/ortografia (com uso de API externa)
+5. ⚪ Histórico de versões
+6. ⚪ Internacionalização (a princípio tendo apenas português e inglês)
+7. ⚪ Exportação para outros formatos além de PDF (EPUB, Markdown, HTML etc)
 
 ## Desenvolvimento local
 
