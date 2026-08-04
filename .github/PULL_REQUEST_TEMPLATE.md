@@ -16,3 +16,7 @@ Closes #<!-- número da issue -->
 - [ ] `npx ng build` e `npx ng test --watch=false` passam (`src/frontend`)
 - [ ] Status da feature atualizado no README (se aplicável)
 - [ ] Validado manualmente de ponta a ponta (não só testes automatizados)
+
+## Merge
+
+Este PR deve ser fechado com **squash merge**, com a mensagem de commit final no padrão `<tipo>: <descrição> [#<numero-da-issue>]` (ex.: `feat: adiciona busca e substituição de texto [#12]`) — não usar a mensagem default gerada pelo GitHub sem ajustar.

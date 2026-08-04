@@ -20,10 +20,11 @@ description: Use ao concluir o desenvolvimento de uma feature/correção nesta b
    cd ..
    ```
 3. **Atualize o README** se a feature corresponder a um item da seção "Requisitos do Projeto": ajuste o status (🟢/🟡/⚪) e garanta que o link da issue está presente.
-4. **Confirme com o usuário antes de commitar/dar push** — commitar e enviar código para o GitHub são ações que afetam o repositório remoto; siga as convenções de mensagem de commit (`feat:`, `fix:`, `documentation:` etc., ver `CLAUDE.md`).
+4. **Confirme com o usuário antes de commitar/dar push** — commitar e enviar código para o GitHub são ações que afetam o repositório remoto; siga o padrão de mensagem de commit definido em `CLAUDE.md`: `<tipo>: <descrição> [#<numero-da-issue>]` (ex.: `feat: adiciona busca e substituição de texto [#12]`).
 5. **Dê push da branch**:
    ```
    git push -u origin <branch>
    ```
 6. **Abra o Pull Request** para `main`, usando a estrutura de `.github/PULL_REQUEST_TEMPLATE.md`, preenchendo "O que foi feito" e "Como validar", e referenciando a issue com `Closes #<numero>`.
 7. **Não faça merge do PR** — ele fica para revisão manual do usuário. Informe o link do PR e pare aqui.
+8. **Quando o usuário aprovar e pedir o merge**: o merge deve ser **squash merge**, com a mensagem de commit final seguindo o mesmo padrão do item 4 (`<tipo>: <descrição> [#<numero-da-issue>]`) — não aceite a mensagem default do GitHub (gerada a partir do título do PR + lista de commits) sem ajustar ao padrão.

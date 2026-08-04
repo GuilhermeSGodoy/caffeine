@@ -5,7 +5,7 @@ description: Use ao iniciar o desenvolvimento de uma feature, correção ou dema
 
 # start-feature
 
-Workflow deste repositório (ver `CLAUDE.md`): toda feature/correção começa com uma issue no GitHub, e o desenvolvimento acontece numa branch nomeada `<numero-da-issue>-slug-curto`, nunca direto em `main`.
+Workflow deste repositório (ver `CLAUDE.md`): toda feature/correção começa com uma issue no GitHub, e o desenvolvimento acontece numa branch `feature/<numero-da-issue>` ou `bugfix/<numero-da-issue>`, nunca direto em `main`.
 
 ## Passos
 
@@ -17,11 +17,15 @@ Workflow deste repositório (ver `CLAUDE.md`): toda feature/correção começa c
    ```
 3. **Crie a issue no GitHub** usando a estrutura do template em `.github/ISSUE_TEMPLATE/feature.md` (ou `bug.md` se for uma correção). Preencha Contexto, Escopo, Critérios de aceite e Tarefas técnicas com base no que foi discutido com o usuário — não deixe os placeholders do template.
    - Use a API do GitHub (`gh issue create` se disponível, ou requisição HTTP autenticada) para criar a issue com título e corpo já preenchidos. Retenha o número da issue criada.
-4. **Crie e faça checkout da branch** a partir de `main`, nomeada `<numero-da-issue>-<slug-curto-em-kebab-case>` (ex.: `12-busca-e-substituicao`):
+4. **Crie e faça checkout da branch** a partir de `main`, nomeada `feature/<numero-da-issue>` (feature) ou `bugfix/<numero-da-issue>` (correção):
    ```
-   git checkout -b <numero>-<slug>
+   git checkout -b feature/<numero>
    ```
-5. **Comece a implementar** seguindo as convenções de `CLAUDE.md` (testes de domínio, migrations, etc).
+   ou
+   ```
+   git checkout -b bugfix/<numero>
+   ```
+5. **Comece a implementar** seguindo as convenções de `CLAUDE.md` (testes de domínio, migrations, mensagens de commit no formato `<tipo>: <descrição> [#<numero>]`, etc).
 
 ## Observação sobre o hook de proteção
 

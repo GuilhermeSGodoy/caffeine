@@ -29,12 +29,13 @@ Motivo de cada decisão está registrado no histórico de commits e no README �
 
 ## Workflow de desenvolvimento (Git/GitHub)
 
-1. **Toda feature/correção nova começa com uma issue** no GitHub, descrevendo o que será feito. Use o template em `.github/ISSUE_TEMPLATE/feature.md`.
-2. **Branch**: crie a partir de `main`, nomeada `<numero-da-issue>-slug-curto` (ex.: `12-busca-e-substituicao`). Nunca commite direto em `main`.
-3. **Commits**: siga o padrão já usado no histórico — prefixo semântico (`feat:`, `fix:`, `documentation:`, `refactor:`, `test:`, `chore:`) + descrição curta em português.
+1. **Toda feature/correção nova começa com uma issue** no GitHub, descrevendo o que será feito. Use o template em `.github/ISSUE_TEMPLATE/feature.md` (ou `bug.md` para correções).
+2. **Branch**: crie a partir de `main`, seguindo o padrão `feature/<numero-da-issue>` (nova funcionalidade) ou `bugfix/<numero-da-issue>` (correção) — ex.: `feature/12`, `bugfix/15`. Nunca commite direto em `main`. O link com a issue não depende do nome da branch — é garantido pelo `[#<numero>]` na mensagem de commit e pelo `Closes #<numero>` no PR (itens 3 e 4).
+3. **Commits**: prefixo semântico (`feat`, `fix`, `documentation`, `refactor`, `test`, `chore`, ou outro que fizer sentido) seguido de `:`, a descrição em português, e o número da issue entre colchetes ao final — formato `<tipo>: <descrição> [#<numero-da-issue>]` (ex.: `feat: adiciona busca e substituição de texto [#12]`).
 4. **Pull Request**: ao concluir o desenvolvimento na branch, abra um PR para `main` referenciando a issue (ex.: `Closes #12` na descrição, usando o template em `.github/PULL_REQUEST_TEMPLATE.md`). O PR fica para revisão manual do usuário — não faça merge automaticamente.
-5. **README**: ao concluir (ou avançar) uma feature da lista de "Requisitos do Projeto", atualize o status (🟢/🟡/⚪) e o link da issue correspondente na seção correspondente do README.
-6. **CI**: todo PR roda `.github/workflows/ci.yml` (build+test de backend e frontend). Não abra PR para revisão sabendo que o CI está quebrado — rode `dotnet test` e `npx ng build && npx ng test --watch=false` localmente antes.
+5. **Merge**: ao ser aprovado, o merge do PR é sempre **squash merge**, com a mensagem de commit final seguindo o mesmo padrão do item 3 (`<tipo>: <descrição> [#<numero-da-issue>]`) — não usar a mensagem default gerada pelo GitHub a partir do título do PR sem ajustar ao padrão.
+6. **README**: ao concluir (ou avançar) uma feature da lista de "Requisitos do Projeto", atualize o status (🟢/🟡/⚪) e o link da issue correspondente na seção correspondente do README.
+7. **CI**: todo PR roda `.github/workflows/ci.yml` (build+test de backend e frontend). Não abra PR para revisão sabendo que o CI está quebrado — rode `dotnet test` e `npx ng build && npx ng test --watch=false` localmente antes.
 
 ## Validação antes de considerar algo pronto
 
