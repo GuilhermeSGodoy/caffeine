@@ -59,21 +59,80 @@
 
 ## Desenvolvimento local
 
-Requisitos: .NET SDK 10, Node.js 22+, npm.
+### Pré-requisitos
 
-Rodar cada parte em um terminal separado (na raiz do repositório):
+- [.NET SDK 10](https://dotnet.microsoft.com/download)
+- [Node.js 22+](https://nodejs.org/) (inclui npm)
+- Ferramenta `dotnet-ef` (necessária só se for criar/alterar migrations do banco):
+
+  ```powershell
+  dotnet tool install --global dotnet-ef
+  ```
+
+Não é necessário instalar Docker nem SQLite separadamente — o banco é um arquivo local criado automaticamente pelo backend.
+
+### Baixando o projeto
 
 ```powershell
-./scripts/dev-backend.ps1   # API .NET em http://127.0.0.1:5000, hot-reload via dotnet watch
-./scripts/dev-frontend.ps1  # Angular em http://localhost:4200, hot-reload via ng serve
-./scripts/dev-electron.ps1  # opcional: abre a UI dentro do shell Electron
+git clone https://github.com/GuilhermeSGodoy/caffeine.git
+cd caffeine
 ```
 
-Testes:
+### Instalando as dependências
+
+Cada parte do projeto tem seu próprio gerenciador de dependências. Rode a partir da raiz do repositório:
 
 ```powershell
+# Backend (.NET) — restaura os pacotes NuGet
+dotnet restore src/backend/Caffeine.sln
+
+# Frontend (Angular)
+cd src/frontend
+npm install
+cd ../..
+
+# Electron (opcional, só se for testar o empacotamento desktop)
+cd src/electron
+npm install
+cd ../..
+```
+
+### Rodando localmente
+
+Use um terminal separado para cada parte (todos os comandos abaixo a partir da raiz do repositório):
+
+| Script | O que faz | Porta |
+| --- | --- | --- |
+| `./scripts/dev-backend.ps1` | API .NET com hot-reload (`dotnet watch run`) | `http://127.0.0.1:5000` |
+| `./scripts/dev-frontend.ps1` | Angular com hot-reload (`ng serve`) | `http://localhost:4200` |
+| `./scripts/dev-electron.ps1` | Opcional: abre a UI dentro da janela do Electron, apontando para o backend/frontend acima | — |
+
+```powershell
+./scripts/dev-backend.ps1
+```
+
+```powershell
+./scripts/dev-frontend.ps1
+```
+
+Depois de subir os dois, acesse **<http://localhost:4200>** no navegador para usar a aplicação.
+
+Para validar que o backend subiu corretamente:
+
+```powershell
+curl http://127.0.0.1:5000/health
+# esperado: {"status":"ok"}
+```
+
+O banco SQLite de desenvolvimento fica em `.devdata/caffeine.db` (ignorado pelo Git). Para resetar o estado local, pare o backend e apague a pasta `.devdata`.
+
+### Rodando os testes
+
+```powershell
+# Testes do backend (xUnit)
 dotnet test src/backend/Caffeine.sln
-cd src/frontend && npx ng test --watch=false
-```
 
-O banco SQLite de desenvolvimento fica em `.devdata/caffeine.db` (ignorado pelo Git).
+# Testes do frontend (Vitest)
+cd src/frontend
+npx ng test --watch=false
+```
