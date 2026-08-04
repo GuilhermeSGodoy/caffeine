@@ -16,7 +16,13 @@ Workflow deste repositório (ver `CLAUDE.md`): toda feature/correção começa c
    git pull
    ```
 3. **Crie a issue no GitHub** usando a estrutura do template em `.github/ISSUE_TEMPLATE/feature.md` (ou `bug.md` se for uma correção). Preencha Contexto, Escopo, Critérios de aceite e Tarefas técnicas com base no que foi discutido com o usuário — não deixe os placeholders do template.
-   - Use a API do GitHub (`gh issue create` se disponível, ou requisição HTTP autenticada) para criar a issue com título e corpo já preenchidos. Retenha o número da issue criada.
+   - Use `gh issue create` se o GitHub CLI estiver instalado e autenticado.
+   - **Se `gh` não estiver disponível** (verifique com `gh auth status`; neste ambiente historicamente não está instalado): use uma requisição HTTP autenticada à API do GitHub (`POST /repos/<owner>/<repo>/issues`). O token pode ser obtido do Git Credential Manager já configurado na máquina, sem precisar pedir nada ao usuário:
+     ```
+     git credential fill <<< $'protocol=https\nhost=github.com\n'
+     ```
+     Isso retorna `username=` e `password=` (um token OAuth `gho_...` do GitHub). Use esse valor como `Authorization: token <password>` no `curl`/requisição HTTP. Nunca imprima ou registre esse token em arquivos, commits ou na resposta ao usuário — use-o só na chamada em memória.
+   - Retenha o número da issue criada.
 4. **Crie e faça checkout da branch** a partir de `main`, nomeada `feature/<numero-da-issue>` (feature) ou `bugfix/<numero-da-issue>` (correção):
    ```
    git checkout -b feature/<numero>

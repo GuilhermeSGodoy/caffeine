@@ -57,7 +57,9 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 
 **Bugs identificados** (ainda sem issue — abrir uma antes de corrigir, conforme workflow em `CLAUDE.md`):
 
-- Ao criar um novo documento ou capítulo, o conteúdo da pasta no menu lateral é recolhido
+- Delay na contagem de letras e palavras (só atualiza após salvamente automático ou manual, quando deveria ser feito em tempo real)
+- É possível criar pastas/documentos/capítulos com o mesmo nome e, ao renomear, preenche o campo com o nome original
+- É possível criar capítulos dentro de capítulos (seria melhor se capítulos fossem o fim do ramo da árvore)
 
 **Demandas adicionais identificadas durante o desenvolvimento/validação** (fora da lista original; ainda sem issue — abrir uma antes de trabalhar, conforme workflow em `CLAUDE.md`):
 

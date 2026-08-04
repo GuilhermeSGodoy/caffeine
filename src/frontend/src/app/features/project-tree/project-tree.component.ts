@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { TreeModule } from 'primeng/tree';
-import { TreeNodeSelectEvent } from 'primeng/types/tree';
+import { TreeNodeCollapseEvent, TreeNodeExpandEvent, TreeNodeSelectEvent } from 'primeng/types/tree';
 import { ButtonModule } from 'primeng/button';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { MenuItem, TreeNode } from 'primeng/api';
@@ -27,6 +27,20 @@ export class ProjectTreeComponent implements OnInit {
     const node = (event.node as TreeNode<CaffeineNode>).data;
     if (node && OPENABLE_NODE_TYPES.has(node.nodeType)) {
       this.editorSession.open(node.id);
+    }
+  }
+
+  protected onNodeExpand(event: TreeNodeExpandEvent): void {
+    const node = (event.node as TreeNode<CaffeineNode>).data;
+    if (node) {
+      this.store.setExpanded(node.id, true);
+    }
+  }
+
+  protected onNodeCollapse(event: TreeNodeCollapseEvent): void {
+    const node = (event.node as TreeNode<CaffeineNode>).data;
+    if (node) {
+      this.store.setExpanded(node.id, false);
     }
   }
 

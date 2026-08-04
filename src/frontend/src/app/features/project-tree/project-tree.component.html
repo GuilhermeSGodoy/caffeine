@@ -10,6 +10,8 @@
     [(selection)]="selectedNode"
     [contextMenu]="menu"
     (onNodeSelect)="onNodeSelect($event)"
+    (onNodeExpand)="onNodeExpand($event)"
+    (onNodeCollapse)="onNodeCollapse($event)"
     class="project-tree__tree"
   />
 

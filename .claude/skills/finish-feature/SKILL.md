@@ -26,5 +26,6 @@ description: Use ao concluir o desenvolvimento de uma feature/correção nesta b
    git push -u origin <branch>
    ```
 6. **Abra o Pull Request** para `main`, usando a estrutura de `.github/PULL_REQUEST_TEMPLATE.md`, preenchendo "O que foi feito" e "Como validar", e referenciando a issue com `Closes #<numero>`.
+   - Use `gh pr create` se disponível; senão, requisição HTTP autenticada à API do GitHub (`POST /repos/<owner>/<repo>/pulls`) com o mesmo token obtido via `git credential fill` descrito em `start-feature` — não peça um token ao usuário antes de tentar essa via.
 7. **Não faça merge do PR** — ele fica para revisão manual do usuário. Informe o link do PR e pare aqui.
 8. **Quando o usuário aprovar e pedir o merge**: o merge deve ser **squash merge**, com a mensagem de commit final seguindo o mesmo padrão do item 4 (`<tipo>: <descrição> [#<numero-da-issue>]`) — não aceite a mensagem default do GitHub (gerada a partir do título do PR + lista de commits) sem ajustar ao padrão.
