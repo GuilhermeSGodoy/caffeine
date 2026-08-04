@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Subject, debounceTime } from 'rxjs';
 import { DocumentContentApiService } from '../services/document-content-api.service';
+import { calculateWordCount } from '../utils/word-count.util';
 
 const AUTO_SAVE_DEBOUNCE_MS = 3000;
 
@@ -34,8 +35,13 @@ export class EditorSessionStore {
     });
   }
 
-  onContentChange(json: string): void {
+  onContentChange(json: string, plainText: string): void {
     this.contentJson.set(json);
+
+    const { wordCount, charCount } = calculateWordCount(plainText);
+    this.wordCount.set(wordCount);
+    this.charCount.set(charCount);
+
     this.dirty.set(true);
     this.saveRequested.next();
   }
