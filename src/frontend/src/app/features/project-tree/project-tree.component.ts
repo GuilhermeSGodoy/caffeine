@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, effect, inject } from '@angular/core';
 import { TreeModule } from 'primeng/tree';
 import { TreeNodeCollapseEvent, TreeNodeExpandEvent, TreeNodeSelectEvent } from 'primeng/types/tree';
 import { ButtonModule } from 'primeng/button';
@@ -22,6 +22,15 @@ export class ProjectTreeComponent implements OnInit {
   private readonly editorSession = inject(EditorSessionStore);
 
   protected selectedNode: TreeNode<CaffeineNode> | null = null;
+
+  constructor() {
+    effect(() => {
+      const nodes = this.store.treeNodes();
+      if (this.selectedNode) {
+        this.selectedNode = this.findNodeByKey(nodes, this.selectedNode.key);
+      }
+    });
+  }
 
   protected onNodeSelect(event: TreeNodeSelectEvent): void {
     const node = (event.node as TreeNode<CaffeineNode>).data;
@@ -60,7 +69,7 @@ export class ProjectTreeComponent implements OnInit {
   protected createRootFolder(): void {
     const title = window.prompt('Nome da nova pasta:');
     if (title) {
-      this.store.createNode(null, NodeType.Folder, title);
+      this.store.createNode(null, NodeType.Folder, title, (message) => window.alert(message));
     }
   }
 
@@ -73,7 +82,7 @@ export class ProjectTreeComponent implements OnInit {
     const label = nodeType === NodeType.Folder ? 'pasta' : nodeType === NodeType.Document ? 'documento' : 'capítulo';
     const title = window.prompt(`Nome do novo ${label}:`);
     if (title) {
-      this.store.createNode(parent.id, nodeType, title);
+      this.store.createNode(parent.id, nodeType, title, (message) => window.alert(message));
     }
   }
 
@@ -85,8 +94,23 @@ export class ProjectTreeComponent implements OnInit {
 
     const title = window.prompt('Novo nome:', node.title);
     if (title) {
-      this.store.renameNode(node, title);
+      this.store.renameNode(node, title, (message) => window.alert(message));
     }
+  }
+
+  private findNodeByKey(nodes: TreeNode<CaffeineNode>[], key: string | undefined): TreeNode<CaffeineNode> | null {
+    for (const node of nodes) {
+      if (node.key === key) {
+        return node;
+      }
+
+      const found = this.findNodeByKey(node.children ?? [], key);
+      if (found) {
+        return found;
+      }
+    }
+
+    return null;
   }
 
   private deleteSelected(): void {

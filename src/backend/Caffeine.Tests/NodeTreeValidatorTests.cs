@@ -24,6 +24,62 @@ public class NodeTreeValidatorTests
     }
 
     [Fact]
+    public void IsDuplicateSiblingName_SameParentSameTitle_ReturnsTrue()
+    {
+        var parentId = Guid.NewGuid();
+        var allNodes = new List<Node>
+        {
+            new() { Id = Guid.NewGuid(), ParentId = parentId, NodeType = NodeType.Document, Title = "Capítulo 1" }
+        };
+
+        var result = NodeTreeValidator.IsDuplicateSiblingName(null, parentId, "Capítulo 1", allNodes);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsDuplicateSiblingName_ComparisonIsCaseAndWhitespaceInsensitive()
+    {
+        var parentId = Guid.NewGuid();
+        var allNodes = new List<Node>
+        {
+            new() { Id = Guid.NewGuid(), ParentId = parentId, NodeType = NodeType.Document, Title = "Capítulo 1" }
+        };
+
+        var result = NodeTreeValidator.IsDuplicateSiblingName(null, parentId, "  CAPÍTULO 1  ", allNodes);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsDuplicateSiblingName_DifferentParent_ReturnsFalse()
+    {
+        var allNodes = new List<Node>
+        {
+            new() { Id = Guid.NewGuid(), ParentId = Guid.NewGuid(), NodeType = NodeType.Document, Title = "Capítulo 1" }
+        };
+
+        var result = NodeTreeValidator.IsDuplicateSiblingName(null, Guid.NewGuid(), "Capítulo 1", allNodes);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsDuplicateSiblingName_ExcludesTheNodeBeingRenamed()
+    {
+        var parentId = Guid.NewGuid();
+        var nodeId = Guid.NewGuid();
+        var allNodes = new List<Node>
+        {
+            new() { Id = nodeId, ParentId = parentId, NodeType = NodeType.Document, Title = "Capítulo 1" }
+        };
+
+        var result = NodeTreeValidator.IsDuplicateSiblingName(nodeId, parentId, "Capítulo 1", allNodes);
+
+        Assert.False(result);
+    }
+
+    [Fact]
     public void CanMove_ToRoot_IsAlwaysAllowed()
     {
         var nodeId = Guid.NewGuid();

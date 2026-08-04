@@ -20,6 +20,12 @@ public static class NodeTreeValidator
         return AllowedParentTypes[childType].Contains(parentType.Value);
     }
 
+    public static bool IsDuplicateSiblingName(Guid? excludeNodeId, Guid? parentId, string title, IReadOnlyCollection<Node> allNodes) =>
+        allNodes.Any(n =>
+            n.Id != excludeNodeId &&
+            n.ParentId == parentId &&
+            string.Equals(n.Title.Trim(), title.Trim(), StringComparison.OrdinalIgnoreCase));
+
     public static bool CanMove(Guid nodeId, Guid? newParentId, IReadOnlyCollection<Node> allNodes)
     {
         if (newParentId is null)
