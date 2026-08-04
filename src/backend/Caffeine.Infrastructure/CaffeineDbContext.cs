@@ -7,6 +7,7 @@ public class CaffeineDbContext(DbContextOptions<CaffeineDbContext> options) : Db
 {
     public DbSet<Node> Nodes => Set<Node>();
     public DbSet<DocumentContent> DocumentContents => Set<DocumentContent>();
+    public DbSet<UserSettings> UserSettings => Set<UserSettings>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,6 +30,12 @@ public class CaffeineDbContext(DbContextOptions<CaffeineDbContext> options) : Db
                 .WithOne()
                 .HasForeignKey<DocumentContent>(d => d.NodeId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<UserSettings>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+            entity.Property(s => s.Theme).IsRequired();
         });
     }
 }

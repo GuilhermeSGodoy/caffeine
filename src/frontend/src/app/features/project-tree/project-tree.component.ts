@@ -7,13 +7,14 @@ import { MenuItem, TreeNode } from 'primeng/api';
 import { NodeTreeStore } from '../../core/state/node-tree.store';
 import { CaffeineNode, NodeType } from '../../core/models/node.model';
 import { EditorSessionStore } from '../../core/state/editor-session.store';
+import { SettingsDialogComponent } from '../settings/settings-dialog.component';
 
 const OPENABLE_NODE_TYPES = new Set([NodeType.Document, NodeType.Chapter]);
 
 @Component({
   selector: 'app-project-tree',
   standalone: true,
-  imports: [TreeModule, ButtonModule, ContextMenuModule],
+  imports: [TreeModule, ButtonModule, ContextMenuModule, SettingsDialogComponent],
   templateUrl: './project-tree.component.html',
   styleUrl: './project-tree.component.scss'
 })
@@ -22,6 +23,7 @@ export class ProjectTreeComponent implements OnInit {
   private readonly editorSession = inject(EditorSessionStore);
 
   protected selectedNode: TreeNode<CaffeineNode> | null = null;
+  protected settingsVisible = false;
 
   constructor() {
     effect(() => {
@@ -64,6 +66,10 @@ export class ProjectTreeComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.load();
+  }
+
+  protected openSettings(): void {
+    this.settingsVisible = true;
   }
 
   protected createRootFolder(): void {
