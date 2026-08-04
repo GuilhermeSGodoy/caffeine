@@ -55,8 +55,9 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
     - A árvore lateral já reflete pastas/documentos/capítulos com CRUD via menu de contexto.
     - Pendente: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo).
 
-**Bugs identificados** (ainda sem issue — abrir uma antes de corrigir, conforme workflow em `CLAUDE.md`):
+**Bugs identificados** (🟢 corrigido, com issue linkada · sem marcação = ainda sem issue, abrir uma antes de corrigir, conforme workflow em `CLAUDE.md`):
 
+- 🟢 Ao criar um novo documento ou capítulo, o conteúdo da pasta no menu lateral é recolhido ([#3](https://github.com/GuilhermeSGodoy/caffeine/issues/3))
 - Delay na contagem de letras e palavras (só atualiza após salvamente automático ou manual, quando deveria ser feito em tempo real)
 - É possível criar pastas/documentos/capítulos com o mesmo nome e, ao renomear, preenche o campo com o nome original
 - É possível criar capítulos dentro de capítulos (seria melhor se capítulos fossem o fim do ramo da árvore)
