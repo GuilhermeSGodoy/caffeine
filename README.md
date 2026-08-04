@@ -21,26 +21,28 @@
 
 Legenda de status: 🟢 Concluído · 🟡 Em andamento · ⚪ Não iniciado
 
+Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou seu desenvolvimento. A partir de agora, todo novo trabalho (feature, bug ou demanda identificada) segue o workflow descrito em `CLAUDE.md`: abre-se uma issue primeiro, e o link entra aqui.
+
 ### Fase 1
 
-1. 🟢 Criar/editar/deletar documentos
+1. 🟢 Criar/editar/deletar documentos ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
    - CRUD completo via árvore lateral (criar, renomear, excluir com cascade) + edição de conteúdo via editor Tiptap.
    - Pendente: mover documentos entre pastas pela UI (drag-and-drop) — hoje só é possível via chamada direta à API (`PUT /api/nodes/{id}`); a validação de regras de movimentação já existe no backend.
 2. ⚪ Escolha de diferentes temas de cores
    - Só o preset padrão do PrimeNG (Aura) está configurado; não há seletor de tema nem persistência da preferência do usuário.
-3. 🟢 Criar/editar/deletar sub abas/capítulos em um projeto/documento
+3. 🟢 Criar/editar/deletar sub abas/capítulos em um projeto/documento ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
    - Mesma base de CRUD de nós, com validação de hierarquia (capítulo só pode estar sob documento ou outro capítulo).
 4. ⚪ Criar/editar/deletar comentários ao longo do texto (incluindo comentários internos)
    - Modelagem de dados já desenhada na arquitetura (`Comment` ancorado via mark do Tiptap), mas ainda não implementada.
-5. 🟢 Criar/editar/deletar pastas para diferentes projetos, com seus próprios arquivos internos ou diretórios
-6. 🟡 Auto-save a cada x segundos
+5. 🟢 Criar/editar/deletar pastas para diferentes projetos, com seus próprios arquivos internos ou diretórios ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
+6. 🟡 Auto-save a cada x segundos ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
    - Implementado com debounce fixo de 3 segundos + salvamento manual (`Ctrl+S`).
    - Pendente: tornar o intervalo configurável pelo usuário (hoje é fixo no código).
 7. ⚪ Busca e substituição de texto (com regex opcional)
-8. 🟡 Contador de palavras/caracteres em tempo real
+8. 🟡 Contador de palavras/caracteres em tempo real ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
    - Backend calcula e persiste a contagem a cada salvamento; frontend exibe o valor retornado.
    - Gap identificado na validação: a contagem só atualiza após o auto-save (a cada ~3s) ou `Ctrl+S`, não a cada tecla digitada — não é "tempo real" de fato ainda. Próximo passo: calcular a contagem no cliente a cada alteração do editor e reconciliar com o valor do backend após salvar.
-9. 🟡 Atalhos de teclado (Ctrl + B, Ctrl + S, Ctrl + P etc)
+9. 🟡 Atalhos de teclado (Ctrl + B, Ctrl + S, Ctrl + P etc) ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
    - `Ctrl+S` implementado (força salvamento). `Ctrl+B`/`Ctrl+I` (negrito/itálico) já vêm de série do StarterKit do Tiptap.
    - Pendente: `Ctrl+P` e demais atalhos do produto; painel de ajuda/listagem de atalhos.
 10. ⚪ Modo leitura/preview
@@ -49,15 +51,15 @@ Legenda de status: 🟢 Concluído · 🟡 Em andamento · ⚪ Não iniciado
 12. ⚪ Importação de arquivos (.txt, .md, .docx)
 13. ⚪ Exportação em PDF básica (formato A4), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
     - Pacote QuestPDF já instalado no backend; lógica de exportação ainda não escrita.
-14. 🟡 Índice inteligente (em formato de menu lateral)
+14. 🟡 Índice inteligente (em formato de menu lateral) ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
     - A árvore lateral já reflete pastas/documentos/capítulos com CRUD via menu de contexto.
     - Pendente: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo).
 
-**Bugs Identificados:**
+**Bugs identificados** (ainda sem issue — abrir uma antes de corrigir, conforme workflow em `CLAUDE.md`):
 
 - Ao criar um novo documento ou capítulo, o conteúdo da pasta no menu lateral é recolhido
 
-**Demandas adicionais identificadas durante o desenvolvimento/validação (fora da lista original):**
+**Demandas adicionais identificadas durante o desenvolvimento/validação** (fora da lista original; ainda sem issue — abrir uma antes de trabalhar, conforme workflow em `CLAUDE.md`):
 
 - UX das ações de criar/renomear/excluir na árvore hoje usa `window.prompt`/`window.confirm` do navegador como placeholder — precisa ser substituído por diálogos do PrimeNG (`p-dialog`) antes de considerar a Fase 1 pronta para uso real.
 - Bundle inicial do frontend passou do orçamento padrão do Angular (500kB) por causa do PrimeNG + Tiptap; o limite foi ajustado para 2MB em `angular.json` como solução temporária — vale revisitar com lazy loading de features antes de ir para produção.

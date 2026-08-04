@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/block-main-commit.js",
+            "statusMessage": "Verificando branch antes de git commit/push..."
+          }
+        ]
+      }
+    ]
+  }
+}
