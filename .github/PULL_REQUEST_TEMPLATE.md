@@ -14,6 +14,7 @@ Closes #<!-- número da issue -->
 
 - [ ] `dotnet build` e `dotnet test` passam (`src/backend/Caffeine.sln`)
 - [ ] `npx ng build` e `npx ng test --watch=false` passam (`src/frontend`)
+- [ ] Teste automatizado novo cobrindo a feature/correção (backend e/ou frontend)
 - [ ] Status da feature atualizado no README (se aplicável)
 - [ ] Validado manualmente de ponta a ponta (não só testes automatizados)
 

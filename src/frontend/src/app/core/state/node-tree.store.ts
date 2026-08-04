@@ -15,11 +15,24 @@ export class NodeTreeStore {
   private readonly api = inject(NodeApiService);
 
   private readonly nodes = signal<CaffeineNode[]>([]);
+  private readonly expandedIds = signal<Set<string>>(new Set());
 
   readonly treeNodes = computed<TreeNode<CaffeineNode>[]>(() => this.buildTree(this.nodes()));
 
   load() {
     this.api.getTree().subscribe((nodes) => this.nodes.set(nodes));
+  }
+
+  setExpanded(id: string, expanded: boolean) {
+    this.expandedIds.update((ids) => {
+      const next = new Set(ids);
+      if (expanded) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
   }
 
   createNode(parentId: string | null, nodeType: NodeType, title: string) {
@@ -39,6 +52,7 @@ export class NodeTreeStore {
   }
 
   deleteNode(id: string) {
+    this.setExpanded(id, false);
     this.api.delete(id).subscribe(() => this.load());
   }
 
@@ -62,7 +76,8 @@ export class NodeTreeStore {
         icon: NODE_ICONS[node.nodeType],
         data: node,
         children,
-        leaf: children.length === 0
+        leaf: children.length === 0,
+        expanded: this.expandedIds().has(node.id)
       };
     };
 
