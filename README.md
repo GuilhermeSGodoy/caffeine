@@ -39,9 +39,8 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
    - Implementado com debounce fixo de 3 segundos + salvamento manual (`Ctrl+S`).
    - Pendente: tornar o intervalo configurável pelo usuário (hoje é fixo no código).
 7. ⚪ Busca e substituição de texto (com regex opcional)
-8. 🟡 Contador de palavras/caracteres em tempo real ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
-   - Backend calcula e persiste a contagem a cada salvamento; frontend exibe o valor retornado.
-   - Gap identificado na validação: a contagem só atualiza após o auto-save (a cada ~3s) ou `Ctrl+S`, não a cada tecla digitada — não é "tempo real" de fato ainda. Próximo passo: calcular a contagem no cliente a cada alteração do editor e reconciliar com o valor do backend após salvar.
+8. 🟢 Contador de palavras/caracteres em tempo real ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2), [#5](https://github.com/GuilhermeSGodoy/caffeine/issues/5))
+   - Backend calcula e persiste a contagem a cada salvamento; frontend recalcula localmente a cada alteração do editor (`onUpdate` do Tiptap) e reconcilia com o valor do backend após salvar.
 9. 🟡 Atalhos de teclado (Ctrl + B, Ctrl + S, Ctrl + P etc) ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
    - `Ctrl+S` implementado (força salvamento). `Ctrl+B`/`Ctrl+I` (negrito/itálico) já vêm de série do StarterKit do Tiptap.
    - Pendente: `Ctrl+P` e demais atalhos do produto; painel de ajuda/listagem de atalhos.
@@ -58,7 +57,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 **Bugs identificados** (🟢 corrigido, com issue linkada · sem marcação = ainda sem issue, abrir uma antes de corrigir, conforme workflow em `CLAUDE.md`):
 
 - 🟢 Ao criar um novo documento ou capítulo, o conteúdo da pasta no menu lateral é recolhido ([#3](https://github.com/GuilhermeSGodoy/caffeine/issues/3))
-- Delay na contagem de letras e palavras (só atualiza após salvamente automático ou manual, quando deveria ser feito em tempo real)
+- 🟢 Delay na contagem de letras e palavras (só atualiza após salvamente automático ou manual, quando deveria ser feito em tempo real) ([#5](https://github.com/GuilhermeSGodoy/caffeine/issues/5))
 - É possível criar pastas/documentos/capítulos com o mesmo nome e, ao renomear, preenche o campo com o nome original
 - É possível criar capítulos dentro de capítulos (seria melhor se capítulos fossem o fim do ramo da árvore)
 

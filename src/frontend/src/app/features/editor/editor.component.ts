@@ -43,7 +43,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       element: this.editorHost.nativeElement,
       extensions: [StarterKit],
       content: JSON.parse(this.store.contentJson()),
-      onUpdate: ({ editor }) => this.store.onContentChange(JSON.stringify(editor.getJSON()))
+      onUpdate: ({ editor }) => this.store.onContentChange(JSON.stringify(editor.getJSON()), editor.getText())
     });
     this.lastLoadedNodeId = this.store.openNodeId();
   }
