@@ -72,6 +72,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Refinar temas existentes e criar novas opções.
 - Documentação/Swagger da API.
 - Lixeira de pastas/documentos/capítulos, com opção de restauração para o escopo original.
+- Estilizar e ajustar padding/overflow das barras de scroll do menu lateral.
 
 ### Fase 2
 
