@@ -16,4 +16,16 @@
   />
 
   <p-contextMenu #menu [model]="contextMenuItems" />
+
+  <div class="project-tree__footer">
+    <p-button
+      icon="pi pi-cog"
+      severity="secondary"
+      [text]="true"
+      styleClass="project-tree__settings-button"
+      (onClick)="openSettings()"
+    />
+  </div>
 </div>
+
+<app-settings-dialog [visible]="settingsVisible" (visibleChange)="settingsVisible = $event" />

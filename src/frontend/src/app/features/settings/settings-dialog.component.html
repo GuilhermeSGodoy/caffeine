@@ -1,0 +1,27 @@
+<p-dialog
+  header="Configurações"
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '28rem' }"
+>
+  <p-panel header="Tema" [toggleable]="true" [collapsed]="true">
+    <div class="settings-dialog__theme-list">
+      @for (theme of themeStore.themes; track theme.id) {
+        <button
+          type="button"
+          class="settings-dialog__theme-option"
+          [class.settings-dialog__theme-option--selected]="theme.id === themeStore.currentThemeId()"
+          (click)="selectTheme(theme.id)"
+        >
+          <span class="settings-dialog__theme-preview" [style.background-color]="theme.previewColor"></span>
+          <span class="settings-dialog__theme-label">{{ theme.label }}</span>
+          @if (theme.id === themeStore.currentThemeId()) {
+            <i class="pi pi-check settings-dialog__theme-check"></i>
+          }
+        </button>
+      }
+    </div>
+  </p-panel>
+</p-dialog>

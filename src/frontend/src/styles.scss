@@ -4,9 +4,24 @@
 html, body {
   height: 100%;
   margin: 0;
+  background-color: var(--p-content-background);
+  color: var(--p-text-color);
 }
 
 .editor__content .tiptap {
   min-height: 100%;
   outline: none;
+}
+
+.project-tree__toolbar .p-button {
+  margin: 0;
+}
+
+.project-tree__footer .p-button.project-tree__settings-button {
+  width: 3rem;
+  height: 3rem;
+}
+
+.project-tree__footer .p-button.project-tree__settings-button .p-button-icon {
+  font-size: 1.75rem;
 }

@@ -28,8 +28,8 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 1. 🟢 Criar/editar/deletar documentos ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
    - CRUD completo via árvore lateral (criar, renomear, excluir com cascade) + edição de conteúdo via editor Tiptap.
    - Pendente: mover documentos entre pastas pela UI (drag-and-drop) — hoje só é possível via chamada direta à API (`PUT /api/nodes/{id}`); a validação de regras de movimentação já existe no backend.
-2. ⚪ Escolha de diferentes temas de cores
-   - Só o preset padrão do PrimeNG (Aura) está configurado; não há seletor de tema nem persistência da preferência do usuário.
+2. 🟢 Escolha de diferentes temas de cores ([#9](https://github.com/GuilhermeSGodoy/caffeine/issues/9))
+   - Seletor de temas na seção de configurações (ícone de engrenagem no menu lateral): Aura, Caffeine, Tokyo, Darkwood e Latte, com preview de cor e persistência no banco de dados.
 3. 🟢 Criar/editar/deletar sub abas/capítulos em um projeto/documento ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
    - Mesma base de CRUD de nós, com validação de hierarquia (capítulo só pode estar sob documento ou outro capítulo).
 4. ⚪ Criar/editar/deletar comentários ao longo do texto (incluindo comentários internos)

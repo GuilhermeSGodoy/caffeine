@@ -19,6 +19,7 @@ else
 builder.Services.AddSingleton<IAppDataPathProvider, AppDataPathProvider>();
 builder.Services.AddScoped<INodeRepository, NodeRepository>();
 builder.Services.AddScoped<IDocumentContentRepository, DocumentContentRepository>();
+builder.Services.AddScoped<IUserSettingsRepository, UserSettingsRepository>();
 
 builder.Services.AddDbContext<CaffeineDbContext>((serviceProvider, options) =>
 {
