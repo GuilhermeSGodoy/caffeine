@@ -67,8 +67,10 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Bundle inicial do frontend passou do orçamento padrão do Angular (500kB) por causa do PrimeNG + Tiptap; o limite foi ajustado para 2MB em `angular.json` como solução temporária — vale revisitar com lazy loading de features antes de ir para produção.
 - A janela do Electron não pôde ser validada visualmente durante o desenvolvimento (ambiente headless usado para implementar); validar manualmente com `./scripts/dev-electron.ps1`.
 - Interface para visualização de projetos e documentos, além do menu lateral.
+- Edição de nomes de pastas/documentos/capítulos inline, além da opção de clique com mouse.
 - Refinar temas existentes e criar novas opções.
 - Documentação/Swagger da API.
+- Lixeira de pastas/documentos/capítulos, com opção de restauração para o escopo original.
 
 ### Fase 2
 
