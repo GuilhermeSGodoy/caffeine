@@ -20,11 +20,20 @@ const TREE_ICON_MATCHES_LABEL = {
 
 function tintedPreset(colorFamily: string, surfaceFamily: string, darkenSurface: boolean) {
   const darkestSurfaceShade = darkenSurface ? `{${surfaceFamily}.950}` : undefined;
+  const textOverride = darkenSurface
+    ? {
+        text: {
+          color: `light-dark({${colorFamily}.700}, {${colorFamily}.100})`,
+          hoverColor: `light-dark({${colorFamily}.800}, {${colorFamily}.50})`,
+        },
+      }
+    : {};
 
   return definePreset(
     Aura,
     {
       semantic: {
+        ...textOverride,
         primary: {
           50: `{${colorFamily}.50}`,
           100: `{${colorFamily}.100}`,
