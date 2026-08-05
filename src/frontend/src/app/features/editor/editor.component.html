@@ -19,6 +19,7 @@
 
   <div
     class="editor__content"
+    [hidden]="!store.openNodeId()"
     [style.--page-surround-color]="pageSurroundColor()"
     [style.--page-width-px.px]="pageWidthPx"
     [style.--page-height-px.px]="pageHeightPx"

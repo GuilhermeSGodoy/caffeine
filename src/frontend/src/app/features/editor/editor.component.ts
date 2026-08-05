@@ -16,6 +16,8 @@ import { EditorSessionStore } from '../../core/state/editor-session.store';
 import { ThemeStore } from '../../core/state/theme.store';
 import { findTheme } from '../../core/theming/theme-catalog';
 import { PageBreak } from '../../core/tiptap/page-break.extension';
+import { TabIndent } from '../../core/tiptap/tab-indent.extension';
+import { PaginationExtension } from '../../core/tiptap/pagination.extension';
 import { PaginationEngineService } from '../../core/services/pagination-engine.service';
 import { EditorToolbarComponent } from './editor-toolbar/editor-toolbar.component';
 import {
@@ -80,11 +82,16 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.editor = new Editor({
       element: this.editorHost.nativeElement,
-      extensions: [StarterKit, PageBreak, TextAlign.configure({ types: ['heading', 'paragraph'] })],
+      extensions: [
+        StarterKit,
+        PageBreak,
+        TabIndent,
+        TextAlign.configure({ types: ['heading', 'paragraph'] }),
+        PaginationExtension.configure({ paginationEngine: this.paginationEngine })
+      ],
       content: JSON.parse(this.store.contentJson()),
       onUpdate: ({ editor }) => {
         this.store.onContentChange(JSON.stringify(editor.getJSON()), editor.getText());
-        this.recalculatePagination();
       },
       onSelectionUpdate: ({ editor }) => this.updateActiveAlignment(editor),
       onTransaction: ({ editor }) => this.updateActiveAlignment(editor)
@@ -92,12 +99,15 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     this.lastLoadedNodeId = this.store.openNodeId();
     this.editorInstance.set(this.editor);
 
+    // A extensão de paginação recalcula automaticamente a cada transação do ProseMirror (via
+    // Decorations, que sobrevivem a re-renders do editor). O ResizeObserver cobre o único caso
+    // que não passa por uma transação: redimensionamento da janela, que pode mudar a quebra de
+    // linha do texto sem qualquer edição do documento — por isso só precisa "cutucar" o editor
+    // com uma transação vazia para a extensão reavaliar.
     if (typeof ResizeObserver !== 'undefined') {
       this.resizeObserver = new ResizeObserver(() => this.scheduleRecalculation());
       this.resizeObserver.observe(this.editorHost.nativeElement);
     }
-
-    this.recalculatePagination();
   }
 
   ngOnDestroy(): void {
@@ -127,17 +137,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     if (this.resizeTimeoutId) {
       clearTimeout(this.resizeTimeoutId);
     }
-    this.resizeTimeoutId = setTimeout(() => this.recalculatePagination(), RESIZE_RECALCULATION_DEBOUNCE_MS);
-  }
-
-  private recalculatePagination(): void {
-    requestAnimationFrame(() => {
-      if (this.editorHost) {
-        const tiptapRoot = this.editorHost.nativeElement.querySelector('.tiptap');
-        if (tiptapRoot) {
-          this.paginationEngine.recalculate(tiptapRoot as HTMLElement);
-        }
-      }
-    });
+    this.resizeTimeoutId = setTimeout(() => {
+      this.editor?.view.dispatch(this.editor.view.state.tr);
+    }, RESIZE_RECALCULATION_DEBOUNCE_MS);
   }
 }

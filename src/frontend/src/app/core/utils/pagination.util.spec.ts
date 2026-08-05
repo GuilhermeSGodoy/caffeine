@@ -17,22 +17,22 @@ describe('calculatePageBreaks', () => {
     expect(calculatePageBreaks(measurements, layout)).toEqual([]);
   });
 
-  it('quebra antes do bloco que estoura o espaço restante da página', () => {
+  it('quebra antes do bloco que estoura o espaço restante da página, preenchendo o espaço que sobrou', () => {
     const measurements = [block(0, 600), block(1, 600)];
 
-    expect(calculatePageBreaks(measurements, layout)).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: 32 }]);
+    expect(calculatePageBreaks(measurements, layout)).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: 432 }]);
   });
 
   it('migra um bloco maior que uma página inteira para a próxima página, mesmo sem couber', () => {
     const measurements = [block(0, 600), block(1, 1500)];
 
-    expect(calculatePageBreaks(measurements, layout)).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: 32 }]);
+    expect(calculatePageBreaks(measurements, layout)).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: 432 }]);
   });
 
-  it('força quebra quando forcedBreakBefore é true, mesmo com espaço sobrando', () => {
+  it('força quebra quando forcedBreakBefore é true, preenchendo o espaço que sobrou até o fim da página', () => {
     const measurements = [block(0, 100), block(1, 100, true)];
 
-    expect(calculatePageBreaks(measurements, layout)).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: 32 }]);
+    expect(calculatePageBreaks(measurements, layout)).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: 932 }]);
   });
 
   it('nunca força quebra antes do primeiro bloco do documento', () => {
@@ -45,9 +45,9 @@ describe('calculatePageBreaks', () => {
     const measurements = [block(0, 600), block(1, 600), block(2, 600), block(3, 600)];
 
     expect(calculatePageBreaks(measurements, layout)).toEqual([
-      { breakBeforeBlockIndex: 1, spacerHeightPx: 32 },
-      { breakBeforeBlockIndex: 2, spacerHeightPx: 32 },
-      { breakBeforeBlockIndex: 3, spacerHeightPx: 32 }
+      { breakBeforeBlockIndex: 1, spacerHeightPx: 432 },
+      { breakBeforeBlockIndex: 2, spacerHeightPx: 432 },
+      { breakBeforeBlockIndex: 3, spacerHeightPx: 432 }
     ]);
   });
 });

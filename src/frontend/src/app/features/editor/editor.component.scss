@@ -22,6 +22,12 @@
   &__content {
     flex: 1;
     overflow: auto;
+    // Reserva o espaço da barra de rolagem mesmo quando ela não é necessária. Sem isso, o
+    // motor de paginação entra em loop de realimentação: inserir uma margem de quebra de
+    // página aumenta a altura do conteúdo, o que faz a barra aparecer, o que reduz a largura
+    // disponível para o texto, o que reflui o texto (mais linhas, alturas maiores), o que
+    // muda a decisão de quebra da próxima recalculação — a cada disparo do ResizeObserver.
+    scrollbar-gutter: stable;
     background-color: var(--page-surround-color, transparent);
   }
 

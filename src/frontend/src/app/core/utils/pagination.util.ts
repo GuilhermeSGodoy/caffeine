@@ -26,7 +26,16 @@ export function calculatePageBreaks(
     const startsNewPage = block.index > 0 && (block.forcedBreakBefore || exceedsPage);
 
     if (startsNewPage) {
-      breaks.push({ breakBeforeBlockIndex: block.index, spacerHeightPx: layout.pageGapPx });
+      // A faixa visual do "vão entre folhas" (gradiente em styles.scss) fica em posições fixas,
+      // múltiplas de altura-da-página+vão, a partir do topo do editor — não em função de onde o
+      // conteúdo real termina. Por isso o espaçador precisa completar o espaço que sobrou na
+      // página atual, e só então somar a margem+vão+margem entre páginas; um valor fixo desalinha
+      // a quebra real da faixa visual, e o desalinhamento cresce a cada página subsequente.
+      const remainingSpaceOnPagePx = Math.max(layout.pageHeightPx - heightOnCurrentPage, 0);
+      breaks.push({
+        breakBeforeBlockIndex: block.index,
+        spacerHeightPx: remainingSpaceOnPagePx + layout.pageGapPx
+      });
       heightOnCurrentPage = 0;
     }
 

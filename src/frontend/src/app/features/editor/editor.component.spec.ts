@@ -40,6 +40,16 @@ describe('EditorComponent', () => {
     return fixture;
   }
 
+  it('não exibe a folha da página quando nenhum documento está aberto', () => {
+    const fixture = TestBed.createComponent(EditorComponent);
+    fixture.detectChanges();
+
+    const nativeElement = fixture.nativeElement as HTMLElement;
+    const content = nativeElement.querySelector('.editor__content') as HTMLElement;
+    expect(content.hidden).toBe(true);
+    expect(nativeElement.querySelector('.editor__placeholder')).not.toBeNull();
+  });
+
   it('exibe a contagem de páginas no cabeçalho ao lado da contagem de palavras/caracteres', () => {
     const fixture = createAndOpen();
 
@@ -74,7 +84,7 @@ describe('EditorComponent', () => {
     expect(json.content[0].attrs.textAlign).toBe('center');
   });
 
-  it('recalcula a paginação com alturas medidas mockadas sem depender de layout real', () => {
+  it('decide as quebras de página com alturas medidas mockadas sem depender de layout real', () => {
     createAndOpen();
 
     paginationEngine.blockMeasurer = () => [
@@ -87,9 +97,28 @@ describe('EditorComponent', () => {
     const blockB = document.createElement('p');
     fakeRoot.append(blockA, blockB);
 
-    paginationEngine.recalculate(fakeRoot);
+    const breaks = paginationEngine.computeBreaks(fakeRoot);
 
     expect(paginationEngine.pageCount()).toBe(2);
-    expect(blockA.style.marginBottom).not.toBe('');
+    expect(breaks).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: expect.any(Number) }]);
+  });
+
+  it('recalcula a paginação ao abrir um documento diferente, mesmo sem edição subsequente', async () => {
+    const fixture = createAndOpen();
+    const computeBreaksSpy = vi.spyOn(paginationEngine, 'computeBreaks');
+
+    const doc2: DocumentContent = {
+      nodeId: 'doc-2',
+      contentJson: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Outro"}]}]}',
+      wordCount: 1,
+      charCount: 5
+    };
+    store.open(doc2.nodeId);
+    http.expectOne(`${API_BASE_URL}/documents/${doc2.nodeId}`).flush(doc2);
+    fixture.detectChanges();
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    expect(computeBreaksSpy).toHaveBeenCalled();
   });
 });

@@ -13,7 +13,32 @@ html, body {
   min-height: var(--page-height-px, 1123px);
   padding: var(--page-margin-top-px, 94px) var(--page-margin-right-px, 94px) var(--page-margin-bottom-px, 94px)
     var(--page-margin-left-px, 94px);
+  /* page-layout.constants.ts calcula PAGE_CONTENT_HEIGHT_PX subtraindo o padding da altura da
+     página — isso só é verdade se o padding for incluído dentro do min-height (border-box), não
+     somado por fora (content-box, padrão do navegador). */
+  box-sizing: border-box;
   outline: none;
+
+  /* O motor de paginação (pagination-engine.service.ts) mede a altura de cada bloco via
+     getBoundingClientRect, que não inclui margens — e controla todo o espaçamento vertical
+     (entre blocos e entre páginas) através de marginBottom aplicado por ele mesmo. Margens
+     padrão do navegador em blocos (parágrafos, títulos, listas) ficariam de fora dessa
+     medição, fazendo o conteúdo real ocupar mais espaço do que o calculado e estourar o
+     limite da página. */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  blockquote,
+  ul,
+  ol,
+  li,
+  pre {
+    margin: 0;
+  }
 
   /* Simula folhas A4 empilhadas: cada ciclo do gradiente pinta uma folha inteira (margens +
      conteúdo) na cor de fundo do tema, seguida de um vão decorativo na cor de "espaço vazio"
