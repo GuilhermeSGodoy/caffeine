@@ -72,6 +72,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Refinar temas existentes e criar novas opções.
 - Documentação/Swagger da API.
 - Lixeira de pastas/documentos/capítulos, com opção de restauração para o escopo original.
+- 🟢 Infraestrutura de testes E2E com Playwright, para validar layout/DOM real de navegador (identificada durante a investigação da #15, onde jsdom não conseguia flagrar o bug de renderização) ([#18](https://github.com/GuilhermeSGodoy/caffeine/issues/18))
 - Estilizar e ajustar padding/overflow das barras de scroll do menu lateral.
 - Salvar estado das pastas/documentos expandidos no menu lateral
 
@@ -179,4 +180,9 @@ dotnet test src/backend/Caffeine.sln
 # Testes do frontend (Vitest)
 cd src/frontend
 npx ng test --watch=false
+
+# Testes E2E do frontend (Playwright) — exige backend e frontend de dev já rodando
+npm run e2e
 ```
+
+Testes E2E (Playwright) validam layout/DOM real de navegador (Chromium), algo que os specs Angular/Vitest não conseguem — eles rodam em jsdom, onde `getBoundingClientRect` sempre retorna 0. Use Playwright para bugs de renderização/CSS que dependam de medição real de layout; specs Vitest continuam sendo a validação padrão para lógica de componentes/serviços.
