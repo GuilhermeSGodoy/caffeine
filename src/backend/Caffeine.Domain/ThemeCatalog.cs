@@ -2,7 +2,7 @@ namespace Caffeine.Domain;
 
 public static class ThemeCatalog
 {
-    public const string DefaultThemeId = "aura";
+    public const string DefaultThemeId = "caffeine";
 
     private static readonly IReadOnlySet<string> ValidThemeIds = new HashSet<string>
     {

@@ -1,11 +1,12 @@
 import { Component, inject, input, output } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
+import { PanelModule } from 'primeng/panel';
 import { ThemeStore } from '../../core/state/theme.store';
 
 @Component({
   selector: 'app-settings-dialog',
   standalone: true,
-  imports: [DialogModule],
+  imports: [DialogModule, PanelModule],
   templateUrl: './settings-dialog.component.html',
   styleUrl: './settings-dialog.component.scss'
 })

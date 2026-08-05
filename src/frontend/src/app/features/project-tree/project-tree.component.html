@@ -18,7 +18,13 @@
   <p-contextMenu #menu [model]="contextMenuItems" />
 
   <div class="project-tree__footer">
-    <p-button icon="pi pi-cog" size="small" severity="secondary" [text]="true" (onClick)="openSettings()" />
+    <p-button
+      icon="pi pi-cog"
+      severity="secondary"
+      [text]="true"
+      [style]="{ fontSize: '1.75rem', width: '2.75rem', height: '2.75rem' }"
+      (onClick)="openSettings()"
+    />
   </div>
 </div>
 

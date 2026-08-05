@@ -33,7 +33,7 @@ describe('ThemeStore', () => {
     http.expectOne(`${API_BASE_URL}/user-settings`).flush('erro', { status: 500, statusText: 'Server Error' });
     await initPromise;
 
-    expect(store.currentThemeId()).toBe('aura');
+    expect(store.currentThemeId()).toBe('caffeine');
   });
 
   it('remove a classe de modo escuro ao selecionar um tema claro', () => {
