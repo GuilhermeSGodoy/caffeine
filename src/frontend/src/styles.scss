@@ -4,6 +4,8 @@
 html, body {
   height: 100%;
   margin: 0;
+  background-color: var(--p-content-background);
+  color: var(--p-text-color);
 }
 
 .editor__content .tiptap {
