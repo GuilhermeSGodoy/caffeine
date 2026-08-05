@@ -60,6 +60,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - 🟢 Delay na contagem de letras e palavras (só atualiza após salvamente automático ou manual, quando deveria ser feito em tempo real) ([#5](https://github.com/GuilhermeSGodoy/caffeine/issues/5))
 - 🟢 É possível criar pastas/documentos/capítulos com o mesmo nome e, ao renomear, preenche o campo com o nome original ([#7](https://github.com/GuilhermeSGodoy/caffeine/issues/7))
 - É possível criar capítulos dentro de capítulos (seria melhor se capítulos fossem o fim do ramo da árvore)
+- 🟢 Menu lateral cresce em largura conforme o tamanho do conteúdo, em vez de ter largura fixa com rolagem horizontal ([#13](https://github.com/GuilhermeSGodoy/caffeine/issues/13))
 
 **Demandas adicionais identificadas durante o desenvolvimento/validação** (fora da lista original; ainda sem issue — abrir uma antes de trabalhar, conforme workflow em `CLAUDE.md`):
 

@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-width: 260px;
+  width: 260px;
+  flex-shrink: 0;
   border-right: 1px solid var(--p-content-border-color);
   background-color: var(--p-content-background);
   color: var(--p-text-color);
@@ -22,6 +23,7 @@
   &__tree {
     flex: 1;
     overflow: auto;
+    --p-tree-padding: 0.75rem;
   }
 
   &__footer {
