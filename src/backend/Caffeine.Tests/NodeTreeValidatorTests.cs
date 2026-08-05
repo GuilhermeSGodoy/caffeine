@@ -14,7 +14,7 @@ public class NodeTreeValidatorTests
     [InlineData(NodeType.Document, NodeType.Project, true)]
     [InlineData(NodeType.Document, NodeType.Document, false)]
     [InlineData(NodeType.Chapter, NodeType.Document, true)]
-    [InlineData(NodeType.Chapter, NodeType.Chapter, true)]
+    [InlineData(NodeType.Chapter, NodeType.Chapter, false)]
     [InlineData(NodeType.Chapter, NodeType.Folder, false)]
     public void IsParentTypeAllowed_ReturnsExpectedResult(NodeType childType, NodeType? parentType, bool expected)
     {

@@ -11,6 +11,13 @@ import { SettingsDialogComponent } from '../settings/settings-dialog.component';
 
 const OPENABLE_NODE_TYPES = new Set([NodeType.Document, NodeType.Chapter]);
 
+const ALLOWED_CHILD_TYPES: Record<NodeType, NodeType[]> = {
+  [NodeType.Folder]: [NodeType.Folder, NodeType.Document],
+  [NodeType.Project]: [NodeType.Document],
+  [NodeType.Document]: [NodeType.Chapter],
+  [NodeType.Chapter]: []
+};
+
 @Component({
   selector: 'app-project-tree',
   standalone: true,
@@ -55,14 +62,30 @@ export class ProjectTreeComponent implements OnInit {
     }
   }
 
-  protected readonly contextMenuItems: MenuItem[] = [
-    { label: 'Nova pasta', icon: 'pi pi-folder', command: () => this.createChild(NodeType.Folder) },
-    { label: 'Novo documento', icon: 'pi pi-file', command: () => this.createChild(NodeType.Document) },
-    { label: 'Novo capítulo', icon: 'pi pi-file-edit', command: () => this.createChild(NodeType.Chapter) },
-    { separator: true },
-    { label: 'Renomear', icon: 'pi pi-pencil', command: () => this.renameSelected() },
-    { label: 'Excluir', icon: 'pi pi-trash', command: () => this.deleteSelected() }
-  ];
+  protected get contextMenuItems(): MenuItem[] {
+    const selected = this.selectedNode?.data;
+    const allowedChildren = selected ? ALLOWED_CHILD_TYPES[selected.nodeType] : [];
+
+    const creationItems: MenuItem[] = [];
+    if (allowedChildren.includes(NodeType.Folder)) {
+      creationItems.push({ label: 'Nova pasta', icon: 'pi pi-folder', command: () => this.createChild(NodeType.Folder) });
+    }
+    if (allowedChildren.includes(NodeType.Document)) {
+      creationItems.push({ label: 'Novo documento', icon: 'pi pi-file', command: () => this.createChild(NodeType.Document) });
+    }
+    if (allowedChildren.includes(NodeType.Chapter)) {
+      creationItems.push({ label: 'Novo capítulo', icon: 'pi pi-file-edit', command: () => this.createChild(NodeType.Chapter) });
+    }
+    if (creationItems.length > 0) {
+      creationItems.push({ separator: true });
+    }
+
+    return [
+      ...creationItems,
+      { label: 'Renomear', icon: 'pi pi-pencil', command: () => this.renameSelected() },
+      { label: 'Excluir', icon: 'pi pi-trash', command: () => this.deleteSelected() }
+    ];
+  }
 
   ngOnInit(): void {
     this.store.load();
