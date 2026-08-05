@@ -6,6 +6,7 @@ export interface ThemeDefinition {
   label: string;
   dark: boolean;
   previewColor: string;
+  pageSurroundColor: string;
   preset: unknown;
 }
 
@@ -74,11 +75,11 @@ const DarkwoodPreset = tintedPreset('green', 'green', true);
 const LattePreset = tintedPreset('amber', 'stone', false);
 
 export const THEMES: ThemeDefinition[] = [
-  { id: 'caffeine', label: 'Caffeine', dark: true, previewColor: '#172554', preset: CaffeinePreset },
-  { id: 'aura', label: 'Aura', dark: true, previewColor: '#18181b', preset: AuraPreset },
-  { id: 'tokyo', label: 'Tokyo', dark: true, previewColor: '#2e1065', preset: TokyoPreset },
-  { id: 'darkwood', label: 'Darkwood', dark: true, previewColor: '#052e16', preset: DarkwoodPreset },
-  { id: 'latte', label: 'Latte', dark: false, previewColor: '#f5f5f4', preset: LattePreset },
+  { id: 'caffeine', label: 'Caffeine', dark: true, previewColor: '#172554', pageSurroundColor: '#0a1128', preset: CaffeinePreset },
+  { id: 'aura', label: 'Aura', dark: true, previewColor: '#18181b', pageSurroundColor: '#09090b', preset: AuraPreset },
+  { id: 'tokyo', label: 'Tokyo', dark: true, previewColor: '#2e1065', pageSurroundColor: '#1e1033', preset: TokyoPreset },
+  { id: 'darkwood', label: 'Darkwood', dark: true, previewColor: '#052e16', pageSurroundColor: '#03150a', preset: DarkwoodPreset },
+  { id: 'latte', label: 'Latte', dark: false, previewColor: '#f5f5f4', pageSurroundColor: '#e7e2da', preset: LattePreset },
 ];
 
 export const DEFAULT_THEME_ID = 'caffeine';

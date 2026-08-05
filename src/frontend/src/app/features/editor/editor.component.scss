@@ -22,6 +22,12 @@
   &__content {
     flex: 1;
     overflow: auto;
-    padding-top: 0.75rem;
+    background-color: var(--page-surround-color, transparent);
+  }
+
+  &__page-stack {
+    display: flex;
+    justify-content: center;
+    padding: var(--page-gap-px, 32px) 0;
   }
 }

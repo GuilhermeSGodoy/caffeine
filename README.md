@@ -60,7 +60,9 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 
 **Demandas adicionais identificadas durante o desenvolvimento/validação** (fora da lista original; ainda sem issue — abrir uma antes de trabalhar, conforme workflow em `CLAUDE.md`):
 
-- Avançado: criação de paginação padrão com margens pré-definidas em formato A4 e adicionar contagem de páginas total.
+- 🟢 Avançado: criação de paginação padrão com margens pré-definidas em formato A4 e adicionar contagem de páginas total. ([#15](https://github.com/GuilhermeSGodoy/caffeine/issues/15))
+  - Folha A4 visual centralizada com margens de 2,5cm, contagem de páginas no cabeçalho, quebra manual (`Ctrl+Enter`) e automática por bloco (nunca no meio de um parágrafo — bloco que não cabe migra inteiro para a próxima página), alinhamento de texto configurável (esquerda/direita/centro/justificado) e cor de espaço vazio mais escura por tema.
+  - Limitações conhecidas: quebra automática só entre blocos (não há split no meio de um parágrafo, podendo deixar espaço em branco no fim de uma página); recálculo de layout é O(n) sobre todos os blocos a cada edição, podendo gerar jank em documentos muito longos; redimensionar a janela recalcula todas as quebras; um bloco maior que uma página inteira ainda estoura visualmente, sem tentativa de split; nenhuma paridade garantida com a futura exportação em PDF via QuestPDF (motor de layout independente). Evolução para quebra inteligente por linha registrada como demanda na Fase 2.
 - UX das ações de criar/renomear/excluir na árvore hoje usa `window.prompt`/`window.confirm` do navegador como placeholder — precisa ser substituído por diálogos do PrimeNG (`p-dialog`) antes de considerar a Fase 1 pronta para uso real.
 - Bundle inicial do frontend passou do orçamento padrão do Angular (500kB) por causa do PrimeNG + Tiptap; o limite foi ajustado para 2MB em `angular.json` como solução temporária — vale revisitar com lazy loading de features antes de ir para produção.
 - A janela do Electron não pôde ser validada visualmente durante o desenvolvimento (ambiente headless usado para implementar); validar manualmente com `./scripts/dev-electron.ps1`.
@@ -94,6 +96,7 @@ Todos os itens ⚪ **Não iniciado**.
 7. ⚪ Exportação em PDF (complementando o formato A4, ebook ou outros formatos convenientes), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
 8. ⚪ Índice inteligente interno do documento, gerado automaticamente
 9. ⚪ Adicionar opções de responsividade.
+10. ⚪ Avançado: evoluir a paginação da Fase 1 (hoje com quebra automática por bloco) para quebra de página inteligente por linha, no nível de um editor de texto tradicional — quebra exatamente no limite disponível, inclusive no meio de um parágrafo, sem deixar espaço vazio evitável no fim de uma página. Envolve: medição por linha via `Range.getClientRects()` do DOM real do ProseMirror (não só a altura total do bloco); aplicação via Decorations do ProseMirror em vez de manipulação direta de `marginBottom`; recálculo incremental a partir da posição alterada pela transação (`transaction.mapping`), em vez de remedir o documento inteiro a cada edição; tratamento de blocos indivisíveis (imagens, tabelas) que continuam migrando inteiros para a próxima página mesmo com o motor de linha. Mesmo com essa evolução, não há garantia de paridade pixel-perfect com a paginação da exportação em PDF via QuestPDF — motor de layout do Chromium e motor de layout do QuestPDF/.NET nunca terão exatamente as mesmas métricas de fonte/kerning/hinting; a exportação em PDF continuará dependendo da própria paginação do QuestPDF, independente do que for feito aqui.
 
 ### Fase 3
 

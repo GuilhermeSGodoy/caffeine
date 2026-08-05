@@ -1,0 +1,14 @@
+<div class="editor-toolbar">
+  @for (action of alignmentActions; track action.id) {
+    <button
+      type="button"
+      class="editor-toolbar__button"
+      [class.editor-toolbar__button--active]="activeAlignment() === action.id"
+      [title]="action.label"
+      [attr.aria-label]="action.label"
+      (click)="runAction(action)"
+    >
+      <i [class]="action.icon"></i>
+    </button>
+  }
+</div>

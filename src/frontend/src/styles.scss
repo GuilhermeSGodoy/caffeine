@@ -8,9 +8,30 @@ html, body {
   color: var(--p-text-color);
 }
 
-.editor__content .tiptap {
-  min-height: 100%;
+.editor__page-stack .tiptap {
+  width: var(--page-width-px, 794px);
+  min-height: var(--page-height-px, 1123px);
+  padding: var(--page-margin-top-px, 94px) var(--page-margin-right-px, 94px) var(--page-margin-bottom-px, 94px)
+    var(--page-margin-left-px, 94px);
   outline: none;
+
+  /* Simula folhas A4 empilhadas: cada ciclo do gradiente pinta uma folha inteira (margens +
+     conteúdo) na cor de fundo do tema, seguida de um vão decorativo na cor de "espaço vazio"
+     do tema — dando a ilusão de páginas separadas dentro de um único contenteditable contínuo. */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--p-content-background) 0,
+    var(--p-content-background) var(--page-height-px, 1123px),
+    var(--page-surround-color, transparent) var(--page-height-px, 1123px),
+    var(--page-surround-color, transparent) calc(var(--page-height-px, 1123px) + var(--page-gap-px, 32px))
+  );
+  background-size: 100% calc(var(--page-height-px, 1123px) + var(--page-gap-px, 32px));
+}
+
+.editor__page-stack .page-break {
+  height: 0;
+  margin: 0;
+  overflow: hidden;
 }
 
 .project-tree__toolbar .p-button {
