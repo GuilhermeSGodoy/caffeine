@@ -16,7 +16,6 @@ import { EditorSessionStore } from '../../core/state/editor-session.store';
 import { ThemeStore } from '../../core/state/theme.store';
 import { findTheme } from '../../core/theming/theme-catalog';
 import { PageBreak } from '../../core/tiptap/page-break.extension';
-import { TabIndent } from '../../core/tiptap/tab-indent.extension';
 import { PaginationExtension } from '../../core/tiptap/pagination.extension';
 import { PaginationEngineService } from '../../core/services/pagination-engine.service';
 import { EditorToolbarComponent } from './editor-toolbar/editor-toolbar.component';
@@ -85,7 +84,6 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       extensions: [
         StarterKit,
         PageBreak,
-        TabIndent,
         TextAlign.configure({ types: ['heading', 'paragraph'] }),
         PaginationExtension.configure({ paginationEngine: this.paginationEngine })
       ],
