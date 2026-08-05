@@ -73,6 +73,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Documentação/Swagger da API.
 - Lixeira de pastas/documentos/capítulos, com opção de restauração para o escopo original.
 - Estilizar e ajustar padding/overflow das barras de scroll do menu lateral.
+- Salvar estado das pastas/documentos expandidos no menu lateral
 
 ### Fase 2
 
@@ -86,6 +87,7 @@ Todos os itens ⚪ **Não iniciado**.
 6. ⚪ Estatísticas gerais: palavras no documento, por capítulo/sub aba, tempo gasto, progresso dos dias em que o documento foi acessado
 7. ⚪ Exportação em PDF (complementando o formato A4, ebook ou outros formatos convenientes), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
 8. ⚪ Índice inteligente interno do documento, gerado automaticamente
+9. ⚪ Adicionar opções de responsividade.
 
 ### Fase 3
 
