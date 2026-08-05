@@ -11,6 +11,7 @@ import {
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorSessionStore } from '../../core/state/editor-session.store';
+import { TabIndent } from '../../core/tiptap/tab-indent.extension';
 
 @Component({
   selector: 'app-editor',
@@ -41,7 +42,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.editor = new Editor({
       element: this.editorHost.nativeElement,
-      extensions: [StarterKit],
+      extensions: [StarterKit, TabIndent],
       content: JSON.parse(this.store.contentJson()),
       onUpdate: ({ editor }) => this.store.onContentChange(JSON.stringify(editor.getJSON()), editor.getText())
     });
