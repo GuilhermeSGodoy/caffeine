@@ -31,7 +31,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 2. 🟢 Escolha de diferentes temas de cores ([#9](https://github.com/GuilhermeSGodoy/caffeine/issues/9))
    - Seletor de temas na seção de configurações (ícone de engrenagem no menu lateral): Aura, Caffeine, Tokyo, Darkwood e Latte, com preview de cor e persistência no banco de dados.
 3. 🟢 Criar/editar/deletar sub abas/capítulos em um projeto/documento ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
-   - Mesma base de CRUD de nós, com validação de hierarquia (capítulo só pode estar sob documento ou outro capítulo).
+   - Mesma base de CRUD de nós, com validação de hierarquia (capítulo só pode estar sob documento, e é sempre folha da árvore — não aceita filhos).
 4. ⚪ Criar/editar/deletar comentários ao longo do texto (incluindo comentários internos)
    - Modelagem de dados já desenhada na arquitetura (`Comment` ancorado via mark do Tiptap), mas ainda não implementada.
 5. 🟢 Criar/editar/deletar pastas para diferentes projetos, com seus próprios arquivos internos ou diretórios ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
@@ -67,6 +67,8 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Bundle inicial do frontend passou do orçamento padrão do Angular (500kB) por causa do PrimeNG + Tiptap; o limite foi ajustado para 2MB em `angular.json` como solução temporária — vale revisitar com lazy loading de features antes de ir para produção.
 - A janela do Electron não pôde ser validada visualmente durante o desenvolvimento (ambiente headless usado para implementar); validar manualmente com `./scripts/dev-electron.ps1`.
 - Interface para visualização de projetos e documentos, além do menu lateral.
+- Refinar temas existentes e criar novas opções.
+- Documentação/Swagger da API.
 
 ### Fase 2
 
