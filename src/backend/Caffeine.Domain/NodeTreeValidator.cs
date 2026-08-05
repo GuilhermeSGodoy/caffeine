@@ -7,7 +7,7 @@ public static class NodeTreeValidator
         [NodeType.Folder] = [NodeType.Folder],
         [NodeType.Project] = [NodeType.Folder],
         [NodeType.Document] = [NodeType.Folder, NodeType.Project],
-        [NodeType.Chapter] = [NodeType.Document, NodeType.Chapter]
+        [NodeType.Chapter] = [NodeType.Document]
     };
 
     public static bool IsParentTypeAllowed(NodeType childType, NodeType? parentType)
