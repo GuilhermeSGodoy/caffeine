@@ -82,7 +82,7 @@ describe('ProjectTreeComponent', () => {
       const { component, nodesById } = setup();
       (component as unknown as { selectedNode: unknown }).selectedNode = nodesById.get(folder.id);
 
-      const labels = labelsOf((component as unknown as { contextMenuItems: MenuItem[] }).contextMenuItems);
+      const labels = labelsOf((component as unknown as { contextMenuItems: () => MenuItem[] }).contextMenuItems());
       expect(labels).toContain('Nova pasta');
       expect(labels).toContain('Novo documento');
       expect(labels).not.toContain('Novo capítulo');
@@ -92,7 +92,7 @@ describe('ProjectTreeComponent', () => {
       const { component, nodesById } = setup();
       (component as unknown as { selectedNode: unknown }).selectedNode = nodesById.get(documentNode.id);
 
-      const labels = labelsOf((component as unknown as { contextMenuItems: MenuItem[] }).contextMenuItems);
+      const labels = labelsOf((component as unknown as { contextMenuItems: () => MenuItem[] }).contextMenuItems());
       expect(labels).toContain('Novo capítulo');
       expect(labels).not.toContain('Nova pasta');
       expect(labels).not.toContain('Novo documento');
@@ -102,7 +102,7 @@ describe('ProjectTreeComponent', () => {
       const { component, nodesById } = setup();
       (component as unknown as { selectedNode: unknown }).selectedNode = nodesById.get(chapter.id);
 
-      const labels = labelsOf((component as unknown as { contextMenuItems: MenuItem[] }).contextMenuItems);
+      const labels = labelsOf((component as unknown as { contextMenuItems: () => MenuItem[] }).contextMenuItems());
       expect(labels).not.toContain('Nova pasta');
       expect(labels).not.toContain('Novo documento');
       expect(labels).not.toContain('Novo capítulo');

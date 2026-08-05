@@ -1,4 +1,4 @@
-import { Component, OnInit, effect, inject } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
 import { TreeModule } from 'primeng/tree';
 import { TreeNodeCollapseEvent, TreeNodeExpandEvent, TreeNodeSelectEvent } from 'primeng/types/tree';
 import { ButtonModule } from 'primeng/button';
@@ -29,14 +29,23 @@ export class ProjectTreeComponent implements OnInit {
   protected readonly store = inject(NodeTreeStore);
   private readonly editorSession = inject(EditorSessionStore);
 
-  protected selectedNode: TreeNode<CaffeineNode> | null = null;
+  private readonly selectedNodeSignal = signal<TreeNode<CaffeineNode> | null>(null);
   protected settingsVisible = false;
+
+  protected get selectedNode(): TreeNode<CaffeineNode> | null {
+    return this.selectedNodeSignal();
+  }
+
+  protected set selectedNode(value: TreeNode<CaffeineNode> | null) {
+    this.selectedNodeSignal.set(value);
+  }
 
   constructor() {
     effect(() => {
       const nodes = this.store.treeNodes();
-      if (this.selectedNode) {
-        this.selectedNode = this.findNodeByKey(nodes, this.selectedNode.key);
+      const current = untracked(() => this.selectedNode);
+      if (current) {
+        this.selectedNode = this.findNodeByKey(nodes, current.key);
       }
     });
   }
@@ -62,8 +71,8 @@ export class ProjectTreeComponent implements OnInit {
     }
   }
 
-  protected get contextMenuItems(): MenuItem[] {
-    const selected = this.selectedNode?.data;
+  protected readonly contextMenuItems = computed<MenuItem[]>(() => {
+    const selected = this.selectedNodeSignal()?.data;
     const allowedChildren = selected ? ALLOWED_CHILD_TYPES[selected.nodeType] : [];
 
     const creationItems: MenuItem[] = [];
@@ -85,7 +94,7 @@ export class ProjectTreeComponent implements OnInit {
       { label: 'Renomear', icon: 'pi pi-pencil', command: () => this.renameSelected() },
       { label: 'Excluir', icon: 'pi pi-trash', command: () => this.deleteSelected() }
     ];
-  }
+  });
 
   ngOnInit(): void {
     this.store.load();
