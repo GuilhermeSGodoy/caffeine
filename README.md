@@ -27,7 +27,6 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 
 1. 🟢 Criar/editar/deletar documentos ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
    - CRUD completo via árvore lateral (criar, renomear, excluir com cascade) + edição de conteúdo via editor Tiptap.
-   - Pendente: mover documentos entre pastas pela UI (drag-and-drop) — hoje só é possível via chamada direta à API (`PUT /api/nodes/{id}`); a validação de regras de movimentação já existe no backend.
 2. 🟢 Escolha de diferentes temas de cores ([#9](https://github.com/GuilhermeSGodoy/caffeine/issues/9))
    - Seletor de temas na seção de configurações (ícone de engrenagem no menu lateral): Aura, Caffeine, Tokyo, Darkwood e Latte, com preview de cor e persistência no banco de dados.
 3. 🟢 Criar/editar/deletar sub abas/capítulos em um projeto/documento ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
@@ -35,24 +34,21 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 4. ⚪ Criar/editar/deletar comentários ao longo do texto (incluindo comentários internos)
    - Modelagem de dados já desenhada na arquitetura (`Comment` ancorado via mark do Tiptap), mas ainda não implementada.
 5. 🟢 Criar/editar/deletar pastas para diferentes projetos, com seus próprios arquivos internos ou diretórios ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
-6. 🟡 Auto-save a cada x segundos ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
+6. 🟢 Auto-save a cada x segundos ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
    - Implementado com debounce fixo de 3 segundos + salvamento manual (`Ctrl+S`).
-   - Pendente: tornar o intervalo configurável pelo usuário (hoje é fixo no código).
 7. ⚪ Busca e substituição de texto (com regex opcional)
 8. 🟢 Contador de palavras/caracteres em tempo real ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2), [#5](https://github.com/GuilhermeSGodoy/caffeine/issues/5))
    - Backend calcula e persiste a contagem a cada salvamento; frontend recalcula localmente a cada alteração do editor (`onUpdate` do Tiptap) e reconcilia com o valor do backend após salvar.
-9. 🟡 Atalhos de teclado (Ctrl + B, Ctrl + S, Ctrl + P etc) ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
+9. 🟢 Atalhos de teclado (Ctrl + B, Ctrl + S, Ctrl + P etc) ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
    - `Ctrl+S` implementado (força salvamento). `Ctrl+B`/`Ctrl+I` (negrito/itálico) já vêm de série do StarterKit do Tiptap.
-   - Pendente: `Ctrl+P` e demais atalhos do produto; painel de ajuda/listagem de atalhos.
 10. ⚪ Modo leitura/preview
 11. ⚪ Tags/labels para organizar documentos/diretórios (definidas pelo usuário, com título e cor)
     - Modelagem (`Tag`/`NodeTag`) já prevista na arquitetura, ainda não implementada.
 12. ⚪ Importação de arquivos (.txt, .md, .docx)
 13. ⚪ Exportação em PDF básica (formato A4), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
     - Pacote QuestPDF já instalado no backend; lógica de exportação ainda não escrita.
-14. 🟡 Índice inteligente (em formato de menu lateral) ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
+14. 🟢 Índice inteligente (em formato de menu lateral) ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
     - A árvore lateral já reflete pastas/documentos/capítulos com CRUD via menu de contexto.
-    - Pendente: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo).
 
 **Bugs identificados** (🟢 corrigido, com issue linkada · sem marcação = ainda sem issue, abrir uma antes de corrigir, conforme workflow em `CLAUDE.md`):
 
@@ -64,16 +60,26 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 
 **Demandas adicionais identificadas durante o desenvolvimento/validação** (fora da lista original; ainda sem issue — abrir uma antes de trabalhar, conforme workflow em `CLAUDE.md`):
 
+- Avançado: criação de paginação padrão com margens pré-definidas em formato A4 e adicionar contagem de páginas total.
 - UX das ações de criar/renomear/excluir na árvore hoje usa `window.prompt`/`window.confirm` do navegador como placeholder — precisa ser substituído por diálogos do PrimeNG (`p-dialog`) antes de considerar a Fase 1 pronta para uso real.
 - Bundle inicial do frontend passou do orçamento padrão do Angular (500kB) por causa do PrimeNG + Tiptap; o limite foi ajustado para 2MB em `angular.json` como solução temporária — vale revisitar com lazy loading de features antes de ir para produção.
 - A janela do Electron não pôde ser validada visualmente durante o desenvolvimento (ambiente headless usado para implementar); validar manualmente com `./scripts/dev-electron.ps1`.
 - Interface para visualização de projetos e documentos, além do menu lateral.
+- Mover documentos entre pastas pela UI (drag-and-drop) — hoje só é possível via chamada direta à API (`PUT /api/nodes/{id}`); a validação de regras de movimentação já existe no backend.
 - Edição de nomes de pastas/documentos/capítulos inline, além da opção de clique com mouse.
 - Refinar temas existentes e criar novas opções.
 - Documentação/Swagger da API.
 - Lixeira de pastas/documentos/capítulos, com opção de restauração para o escopo original.
 - Estilizar e ajustar padding/overflow das barras de scroll do menu lateral.
-- Salvar estado das pastas/documentos expandidos no menu lateral
+- Salvar estado das pastas/documentos expandidos no menu lateral.
+- Trocar nome do frontend de "Frontend" para "Caffeine" e adicionar um ícone customizado.
+- Definir nova fonte padrão para o sistema.
+- Auto-save: tornar o intervalo configurável pelo usuário (hoje é fixo no código).
+- Atalhos do teclado: `Ctrl+P` e demais atalhos do produto; painel de ajuda/listagem de atalhos.
+- Hover nos itens do menu lateral e botão de configurações.
+- Configurações de página/editor de texto: hifenização automática.
+- Configurações de página/editor de texto: espaçamento entre linhas e parágrafos.
+- Avançado: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo). Avaliar a criação de estruturas diferentes de documento: um sem a adição de capítulos internos, e outro em que o documento principal serve como uma estrutura para unir os capítulos internos num único documento, conforme preferência do usuário (possibilidade de usar drag-and-drop para a organização do conteúdo).
 
 ### Fase 2
 
