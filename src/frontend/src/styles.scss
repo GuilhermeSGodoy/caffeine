@@ -17,6 +17,10 @@ html, body {
   margin: 0;
 }
 
+.project-tree__tree .p-tree-node-label {
+  white-space: nowrap;
+}
+
 .project-tree__footer .p-button.project-tree__settings-button {
   width: 3rem;
   height: 3rem;

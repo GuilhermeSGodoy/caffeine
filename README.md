@@ -60,6 +60,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - 🟢 Delay na contagem de letras e palavras (só atualiza após salvamente automático ou manual, quando deveria ser feito em tempo real) ([#5](https://github.com/GuilhermeSGodoy/caffeine/issues/5))
 - 🟢 É possível criar pastas/documentos/capítulos com o mesmo nome e, ao renomear, preenche o campo com o nome original ([#7](https://github.com/GuilhermeSGodoy/caffeine/issues/7))
 - 🟢 É possível criar capítulos dentro de capítulos (seria melhor se capítulos fossem o fim do ramo da árvore) ([#11](https://github.com/GuilhermeSGodoy/caffeine/issues/11))
+- 🟢 Menu lateral cresce em largura conforme o tamanho do conteúdo, em vez de ter largura fixa com rolagem horizontal ([#13](https://github.com/GuilhermeSGodoy/caffeine/issues/13))
 
 **Demandas adicionais identificadas durante o desenvolvimento/validação** (fora da lista original; ainda sem issue — abrir uma antes de trabalhar, conforme workflow em `CLAUDE.md`):
 
@@ -71,6 +72,8 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Refinar temas existentes e criar novas opções.
 - Documentação/Swagger da API.
 - Lixeira de pastas/documentos/capítulos, com opção de restauração para o escopo original.
+- Estilizar e ajustar padding/overflow das barras de scroll do menu lateral.
+- Salvar estado das pastas/documentos expandidos no menu lateral
 
 ### Fase 2
 
@@ -84,6 +87,7 @@ Todos os itens ⚪ **Não iniciado**.
 6. ⚪ Estatísticas gerais: palavras no documento, por capítulo/sub aba, tempo gasto, progresso dos dias em que o documento foi acessado
 7. ⚪ Exportação em PDF (complementando o formato A4, ebook ou outros formatos convenientes), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
 8. ⚪ Índice inteligente interno do documento, gerado automaticamente
+9. ⚪ Adicionar opções de responsividade.
 
 ### Fase 3
 
