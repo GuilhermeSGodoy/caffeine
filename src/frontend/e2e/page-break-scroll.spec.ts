@@ -27,7 +27,7 @@ async function openDocumentWithContent(
 
   const contentJson = JSON.stringify({
     type: 'doc',
-    content: [{ type: 'paragraph', content: [{ type: 'text', text }] }]
+    content: [{ type: 'paragraph', content: text ? [{ type: 'text', text }] : [] }]
   });
   const saveResponse = await request.put(`${API_BASE_URL}/documents/${document.id}`, {
     data: { contentJson }
@@ -141,5 +141,76 @@ test('ao inserir quebra manual de página no meio de um parágrafo, o texto rest
   await expect(async () => {
     const scrollTop = await editorContent.evaluate((el) => el.scrollTop);
     expect(scrollTop).toBeGreaterThan(scrollTopBeforeBreak);
+  }).toPass({ timeout: 5000 });
+});
+
+// Bug relatado após validação manual: ao inserir uma quebra manual de página (criando uma página 2
+// em branco) e então apertar Ctrl+Enter DE NOVO ainda sobre o parágrafo vazio da página 2 (querendo
+// uma página 3), o cursor voltava para a página anterior em vez de criar a página nova — a quebra
+// manual só funcionava quando o parágrafo atual tinha pelo menos 1 caractere. Causa raiz: o
+// insertContent do Tiptap substitui um parágrafo vazio pelo próprio nó da quebra (em vez de dividi-
+// lo), sem sobrar nenhum parágrafo depois — ver page-break.extension.ts. A correção detecta esse
+// caso e insere a quebra ANTES do parágrafo vazio, que passa a ser o parágrafo da página nova (sem
+// duplicá-lo).
+test('ao inserir quebra manual de página no parágrafo vazio de uma página recém-criada, uma página nova em branco é criada sem voltar o cursor para a página anterior', async ({
+  page,
+  request
+}) => {
+  const { editorContent, tiptap } = await openDocumentWithContent(
+    page,
+    request,
+    `vazio-${Date.now()}`,
+    'Conteúdo da página 1.'
+  );
+
+  await tiptap.click();
+  await expect(tiptap).toHaveClass(/ProseMirror-focused/);
+
+  // Posiciona o cursor no fim do texto via Range nativo em vez de Control+End: o observador de
+  // seleção do ProseMirror não é síncrono com o evento nativo de teclado, então essa combinação
+  // seguida de Ctrl+Enter mostrou-se instável (mesma race condition documentada no teste do meio
+  // de parágrafo, abaixo) — setar a posição final diretamente evita essa flakiness.
+  await page.evaluate(() => {
+    const textNode = document.querySelector('.editor__page-stack .tiptap p')?.firstChild;
+    if (!textNode) {
+      throw new Error('Nó de texto do primeiro parágrafo não encontrado');
+    }
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    range.collapse(false);
+    const selection = document.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  });
+
+  const pageBreaks = tiptap.locator('[data-type="page-break"]');
+  const paragraphs = tiptap.locator('p');
+
+  // Primeira quebra: caminho já existente (parágrafo com texto), cria a página 2 com um parágrafo
+  // vazio — ponto de partida para reproduzir o bug relatado.
+  await page.keyboard.press('Control+Enter');
+  await expect(pageBreaks).toHaveCount(1);
+  await expect(paragraphs).toHaveCount(2);
+  await expect(paragraphs.last()).toHaveText('');
+
+  const scrollTopBeforeSecondBreak = await editorContent.evaluate((el) => el.scrollTop);
+
+  // Segunda quebra: cursor ainda no parágrafo vazio da página 2 — é exatamente o cenário do bug.
+  await page.keyboard.press('Control+Enter');
+
+  // O parágrafo vazio da página 2 não é duplicado: ele próprio passa a ser o parágrafo da página 3,
+  // e o cursor permanece nele (não deve voltar para a página 1 ou 2).
+  await expect(pageBreaks).toHaveCount(2);
+  await expect(paragraphs).toHaveCount(2);
+  await expect(paragraphs.first()).toHaveText('Conteúdo da página 1.');
+  await expect(paragraphs.last()).toHaveText('');
+
+  await page.keyboard.type('Texto na página 3.');
+  await expect(paragraphs.first()).toHaveText('Conteúdo da página 1.');
+  await expect(paragraphs.last()).toHaveText('Texto na página 3.');
+
+  await expect(async () => {
+    const scrollTop = await editorContent.evaluate((el) => el.scrollTop);
+    expect(scrollTop).toBeGreaterThan(scrollTopBeforeSecondBreak);
   }).toPass({ timeout: 5000 });
 });

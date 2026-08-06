@@ -42,44 +42,65 @@ export const PageBreak = Node.create({
   addKeyboardShortcuts() {
     return {
       'Mod-Enter': () => {
-        // insertContent divide o bloco corretamente (nó da quebra como irmão do parágrafo, não
-        // aninhado dentro dele). O reposicionamento de cursor que ele faz depois, porém, só está
-        // errado em UM cenário: quando a quebra cai no fim do documento, sem nenhum texto
-        // remanescente depois do cursor original — nesse caso ele usa um viés para trás interno
-        // (Selection.near(pos, -1) — ver selectionToInsertionEnd no @tiptap/core) que pula o nó
-        // atômico não-selecionável da quebra e pousa no fim do parágrafo ANTES dela. Quando havia
-        // texto remanescente (quebra no meio do parágrafo), o próprio insertContent já resolve
-        // corretamente para o início do parágrafo remanescente, depois da quebra — não precisa de
-        // correção. Por isso só corrigimos quando detectamos o primeiro caso: $to logo seguido,
-        // ao sair do bloco atual, pelo nó da quebra que acabamos de inserir.
+        // insertContent() do @tiptap/core trata parágrafo vazio de forma estruturalmente diferente
+        // de parágrafo com texto: quando o parágrafo atual tem conteúdo, ele divide o bloco (nó da
+        // quebra como irmão do parágrafo, sobrando um parágrafo remanescente depois) — cenário já
+        // coberto pela correção de cursor abaixo (Selection.near com viés para trás pula o nó
+        // atômico e não-selecionável da quebra e precisa ser reancorada). Quando o parágrafo atual
+        // está VAZIO, porém, insertContent detecta "isEmptyTextBlock" e substitui o parágrafo
+        // inteiro pelo nó da quebra — não sobra nenhum parágrafo depois, então Selection.near não
+        // acha onde pousar e recua para a página anterior (e no caso de parágrafo vazio único no
+        // documento, chega a lançar RangeError). Por isso parágrafo vazio precisa de um caminho
+        // próprio: inserir a quebra ANTES do parágrafo vazio (em vez de no lugar dele), deixando-o
+        // como o primeiro parágrafo da página nova.
         let scrollTargetPos: number | null = null;
 
-        const inserted = this.editor
-          .chain()
-          .insertContent({ type: this.name })
-          .command(({ tr, dispatch }) => {
-            if (!dispatch) {
-              return true;
-            }
+        const { $from } = this.editor.state.selection;
+        const isEmptyParagraph = $from.parent.isTextblock && $from.parent.content.size === 0;
 
-            const { $to } = tr.selection;
-            const afterCurrentBlock = $to.after($to.depth);
-            const maybePageBreak = tr.doc.resolve(afterCurrentBlock).nodeAfter;
+        const inserted = isEmptyParagraph
+          ? this.editor
+              .chain()
+              .command(({ tr, dispatch }) => {
+                if (!dispatch) {
+                  return true;
+                }
 
-            if (maybePageBreak?.type.name === this.name) {
-              const afterPageBreak = afterCurrentBlock + maybePageBreak.nodeSize;
+                const pageBreakNode = tr.doc.type.schema.nodes[this.name].create();
+                const insertPos = tr.selection.$from.before(tr.selection.$from.depth);
 
-              if (!tr.doc.resolve(afterPageBreak).nodeAfter) {
-                tr.insert(afterPageBreak, tr.doc.type.schema.nodes['paragraph'].create());
-              }
+                tr.insert(insertPos, pageBreakNode);
+                tr.setSelection(Selection.near(tr.doc.resolve(insertPos + pageBreakNode.nodeSize), 1));
+                scrollTargetPos = tr.selection.from;
+                return true;
+              })
+              .run()
+          : this.editor
+              .chain()
+              .insertContent({ type: this.name })
+              .command(({ tr, dispatch }) => {
+                if (!dispatch) {
+                  return true;
+                }
 
-              tr.setSelection(Selection.near(tr.doc.resolve(afterPageBreak), 1));
-            }
+                const { $to } = tr.selection;
+                const afterCurrentBlock = $to.after($to.depth);
+                const maybePageBreak = tr.doc.resolve(afterCurrentBlock).nodeAfter;
 
-            scrollTargetPos = tr.selection.from;
-            return true;
-          })
-          .run();
+                if (maybePageBreak?.type.name === this.name) {
+                  const afterPageBreak = afterCurrentBlock + maybePageBreak.nodeSize;
+
+                  if (!tr.doc.resolve(afterPageBreak).nodeAfter) {
+                    tr.insert(afterPageBreak, tr.doc.type.schema.nodes['paragraph'].create());
+                  }
+
+                  tr.setSelection(Selection.near(tr.doc.resolve(afterPageBreak), 1));
+                }
+
+                scrollTargetPos = tr.selection.from;
+                return true;
+              })
+              .run();
 
         if (inserted && scrollTargetPos !== null) {
           scrollToTopOfNewPage(this.editor, scrollTargetPos);

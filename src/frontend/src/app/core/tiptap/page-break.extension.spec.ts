@@ -67,4 +67,33 @@ describe('PageBreak extension', () => {
     scopedEditor.destroy();
     container.remove();
   });
+
+  it('cria uma página nova em branco ao pressionar Mod-Enter num parágrafo vazio único no documento', () => {
+    const emptyEditor = new Editor({ extensions: [StarterKit, PageBreak], content: '<p></p>' });
+
+    emptyEditor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true }));
+
+    const types = emptyEditor.getJSON().content?.map((node) => node.type);
+    expect(types).toEqual(['pageBreak', 'paragraph']);
+
+    const { selection } = emptyEditor.state;
+    expect(selection.$from.parent.type.name).toBe('paragraph');
+    expect(selection.$from.parent.content.size).toBe(0);
+
+    emptyEditor.destroy();
+  });
+
+  it('cria uma segunda página em branco ao pressionar Mod-Enter duas vezes seguidas, sem voltar o cursor para a página anterior', () => {
+    editor.commands.setTextSelection(editor.state.doc.content.size);
+    editor.commands.insertContent({ type: 'pageBreak' });
+
+    editor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true }));
+
+    const types = editor.getJSON().content?.map((node) => node.type);
+    expect(types).toEqual(['paragraph', 'pageBreak', 'pageBreak', 'paragraph']);
+
+    const { selection } = editor.state;
+    expect(selection.$from.parent.type.name).toBe('paragraph');
+    expect(selection.$from.parent.content.size).toBe(0);
+  });
 });
