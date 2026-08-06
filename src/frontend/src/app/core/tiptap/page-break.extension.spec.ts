@@ -1,6 +1,7 @@
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { PageBreak } from './page-break.extension';
+import { PAGE_MARGIN_TOP_PX } from '../utils/page-layout.constants';
 
 describe('PageBreak extension', () => {
   let editor: Editor;
@@ -41,5 +42,29 @@ describe('PageBreak extension', () => {
     editor.commands.insertContent({ type: 'pageBreak' });
 
     expect(editor.getText().trim()).toBe('Antes');
+  });
+
+  it('rola o container da página até o topo da nova página ao inserir quebra manual com Mod-Enter', async () => {
+    const container = document.createElement('div');
+    container.className = 'editor__content';
+    const host = document.createElement('div');
+    container.appendChild(host);
+    document.body.appendChild(container);
+
+    const scopedEditor = new Editor({ element: host, extensions: [StarterKit, PageBreak], content: '<p>Antes</p>' });
+    scopedEditor.commands.setTextSelection(scopedEditor.state.doc.content.size);
+
+    vi.spyOn(container, 'getBoundingClientRect').mockReturnValue({ top: 0 } as DOMRect);
+    vi.spyOn(scopedEditor.view, 'coordsAtPos').mockReturnValue({ top: 500, bottom: 520, left: 0, right: 0 } as never);
+    container.scrollTop = 0;
+
+    scopedEditor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true }));
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    expect(container.scrollTop).toBe(500 - PAGE_MARGIN_TOP_PX);
+
+    scopedEditor.destroy();
+    container.remove();
   });
 });
