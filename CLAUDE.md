@@ -38,12 +38,12 @@ Motivo de cada decisão está registrado no histórico de commits e no README �
 4. **Pull Request**: ao concluir o desenvolvimento na branch, abra um PR para `main` referenciando a issue (ex.: `Closes #12` na descrição, usando o template em `.github/PULL_REQUEST_TEMPLATE.md`). O PR fica para revisão manual do usuário — não faça merge automaticamente.
 5. **Merge**: ao ser aprovado, o merge do PR é sempre um **merge normal** (merge commit, preservando os commits individuais da branch) — não usar squash merge nem rebase merge.
 6. **README**: ao concluir (ou avançar) uma feature da lista de "Requisitos do Projeto", atualize o status (🟢/🟡/⚪) e o link da issue correspondente na seção correspondente do README. O mesmo vale para itens das listas "Bugs identificados" e "Demandas adicionais identificadas": ao corrigir/resolver um item, **não remova a linha** — marque com 🟢 e linke a issue correspondente, preservando o histórico do que já foi identificado e resolvido.
-7. **CI**: todo PR roda `.github/workflows/ci.yml` (build+test de backend e frontend). Não abra PR para revisão sabendo que o CI está quebrado — rode `dotnet test` e `npx ng build && npx ng test --watch=false` localmente antes.
+7. **CI**: todo PR roda `.github/workflows/ci.yml` (build+test de backend, frontend e E2E). O CI é a fonte de verdade para validação da suíte completa — acompanhe o resultado no PR em vez de rodar tudo de novo localmente antes de abrir/atualizar o PR.
 
 ## Validação antes de considerar algo pronto
 
-- Backend: `dotnet build` e `dotnet test` no `src/backend/Caffeine.sln` sem erros.
-- Frontend: `npx ng build` e `npx ng test --watch=false` no `src/frontend` sem erros.
+- Não é necessário rodar a suíte completa (unitários de backend/frontend + E2E) localmente antes de cada commit ou antes de abrir o PR — isso já é custoso e demorado (especialmente os testes E2E do Playwright) e o CI (`.github/workflows/ci.yml`) cobre isso a cada PR/push. Rodar a suíte inteira localmente deixou de ser um passo obrigatório do fluxo.
+- Durante a implementação, rode localmente apenas os testes relevantes à mudança (o spec/arquivo específico do backend ou frontend, ou o novo teste E2E isoladamente) para feedback rápido — não a suíte inteira. Para um bug de reposicionamento de cursor do ProseMirror ou outra race condition, ainda vale rodar o teste E2E novo repetidas vezes isoladamente para checar flakiness antes de commitar, mas sem precisar rodar toda a suíte de E2E junto.
 - Sempre que possível, valide o fluxo end-to-end de verdade (subir backend + frontend via `scripts/dev-*.ps1` e exercitar a feature manualmente ou via `curl`), não só os testes automatizados — vários bugs reais deste projeto só apareceram nessa validação manual (cascade delete, encoding UTF-8 via curl, lockfile cross-platform).
 - Ambiente de execução do Claude Code aqui é sandboxed e não abre janelas gráficas (`ELECTRON_RUN_AS_NODE=1` sempre setado) — a UI do Electron e interações visuais no navegador não podem ser validadas automaticamente; sinalize isso explicitamente em vez de assumir que funcionou.
 
