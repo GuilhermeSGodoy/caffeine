@@ -43,13 +43,15 @@ export const PageBreak = Node.create({
     return {
       'Mod-Enter': () => {
         // insertContent divide o bloco corretamente (nó da quebra como irmão do parágrafo, não
-        // aninhado dentro dele), mas reposiciona o cursor com viés para trás internamente
-        // (Selection.near(pos, -1) — ver selectionToInsertionEnd no @tiptap/core): isso pula o nó
-        // atômico não-selecionável da quebra e sempre pousa exatamente no fim do parágrafo que
-        // antecede a quebra. Em vez de tentar recalcular a posição de inserção original por
-        // aritmética (frágil: o "fitting" do ProseMirror consome uma quantidade de posições que
-        // varia com o ponto de inserção), usamos esse próprio ponto ($to) como referência
-        // confiável para navegar para frente, cruzando o nó da quebra.
+        // aninhado dentro dele). O reposicionamento de cursor que ele faz depois, porém, só está
+        // errado em UM cenário: quando a quebra cai no fim do documento, sem nenhum texto
+        // remanescente depois do cursor original — nesse caso ele usa um viés para trás interno
+        // (Selection.near(pos, -1) — ver selectionToInsertionEnd no @tiptap/core) que pula o nó
+        // atômico não-selecionável da quebra e pousa no fim do parágrafo ANTES dela. Quando havia
+        // texto remanescente (quebra no meio do parágrafo), o próprio insertContent já resolve
+        // corretamente para o início do parágrafo remanescente, depois da quebra — não precisa de
+        // correção. Por isso só corrigimos quando detectamos o primeiro caso: $to logo seguido,
+        // ao sair do bloco atual, pelo nó da quebra que acabamos de inserir.
         let scrollTargetPos: number | null = null;
 
         const inserted = this.editor
@@ -61,15 +63,19 @@ export const PageBreak = Node.create({
             }
 
             const { $to } = tr.selection;
-            const afterParagraph = $to.after($to.depth);
-            const pageBreakNode = tr.doc.resolve(afterParagraph).nodeAfter;
-            const afterPageBreak = pageBreakNode ? afterParagraph + pageBreakNode.nodeSize : afterParagraph;
+            const afterCurrentBlock = $to.after($to.depth);
+            const maybePageBreak = tr.doc.resolve(afterCurrentBlock).nodeAfter;
 
-            if (!tr.doc.resolve(afterPageBreak).nodeAfter) {
-              tr.insert(afterPageBreak, tr.doc.type.schema.nodes['paragraph'].create());
+            if (maybePageBreak?.type.name === this.name) {
+              const afterPageBreak = afterCurrentBlock + maybePageBreak.nodeSize;
+
+              if (!tr.doc.resolve(afterPageBreak).nodeAfter) {
+                tr.insert(afterPageBreak, tr.doc.type.schema.nodes['paragraph'].create());
+              }
+
+              tr.setSelection(Selection.near(tr.doc.resolve(afterPageBreak), 1));
             }
 
-            tr.setSelection(Selection.near(tr.doc.resolve(afterPageBreak), 1));
             scrollTargetPos = tr.selection.from;
             return true;
           })
