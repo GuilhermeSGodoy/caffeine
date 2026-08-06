@@ -8,6 +8,11 @@
             "type": "command",
             "command": "node .claude/hooks/block-main-commit.js",
             "statusMessage": "Verificando branch antes de git commit/push..."
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/validate-commit-message.js",
+            "statusMessage": "Validando formato da mensagem de commit..."
           }
         ]
       }
