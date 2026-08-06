@@ -27,7 +27,6 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 
 1. 🟢 Criar/editar/deletar documentos ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
    - CRUD completo via árvore lateral (criar, renomear, excluir com cascade) + edição de conteúdo via editor Tiptap.
-   - Pendente: mover documentos entre pastas pela UI (drag-and-drop) — hoje só é possível via chamada direta à API (`PUT /api/nodes/{id}`); a validação de regras de movimentação já existe no backend.
 2. 🟢 Escolha de diferentes temas de cores ([#9](https://github.com/GuilhermeSGodoy/caffeine/issues/9))
    - Seletor de temas na seção de configurações (ícone de engrenagem no menu lateral): Aura, Caffeine, Tokyo, Darkwood e Latte, com preview de cor e persistência no banco de dados.
 3. 🟢 Criar/editar/deletar sub abas/capítulos em um projeto/documento ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
@@ -35,24 +34,21 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 4. ⚪ Criar/editar/deletar comentários ao longo do texto (incluindo comentários internos)
    - Modelagem de dados já desenhada na arquitetura (`Comment` ancorado via mark do Tiptap), mas ainda não implementada.
 5. 🟢 Criar/editar/deletar pastas para diferentes projetos, com seus próprios arquivos internos ou diretórios ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
-6. 🟡 Auto-save a cada x segundos ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
+6. 🟢 Auto-save a cada x segundos ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
    - Implementado com debounce fixo de 3 segundos + salvamento manual (`Ctrl+S`).
-   - Pendente: tornar o intervalo configurável pelo usuário (hoje é fixo no código).
 7. ⚪ Busca e substituição de texto (com regex opcional)
 8. 🟢 Contador de palavras/caracteres em tempo real ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2), [#5](https://github.com/GuilhermeSGodoy/caffeine/issues/5))
    - Backend calcula e persiste a contagem a cada salvamento; frontend recalcula localmente a cada alteração do editor (`onUpdate` do Tiptap) e reconcilia com o valor do backend após salvar.
-9. 🟡 Atalhos de teclado (Ctrl + B, Ctrl + S, Ctrl + P etc) ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
+9. 🟢 Atalhos de teclado (Ctrl + B, Ctrl + S, Ctrl + P etc) ([#2](https://github.com/GuilhermeSGodoy/caffeine/issues/2))
    - `Ctrl+S` implementado (força salvamento). `Ctrl+B`/`Ctrl+I` (negrito/itálico) já vêm de série do StarterKit do Tiptap.
-   - Pendente: `Ctrl+P` e demais atalhos do produto; painel de ajuda/listagem de atalhos.
 10. ⚪ Modo leitura/preview
 11. ⚪ Tags/labels para organizar documentos/diretórios (definidas pelo usuário, com título e cor)
     - Modelagem (`Tag`/`NodeTag`) já prevista na arquitetura, ainda não implementada.
 12. ⚪ Importação de arquivos (.txt, .md, .docx)
 13. ⚪ Exportação em PDF básica (formato A4), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
     - Pacote QuestPDF já instalado no backend; lógica de exportação ainda não escrita.
-14. 🟡 Índice inteligente (em formato de menu lateral) ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
+14. 🟢 Índice inteligente (em formato de menu lateral) ([#1](https://github.com/GuilhermeSGodoy/caffeine/issues/1))
     - A árvore lateral já reflete pastas/documentos/capítulos com CRUD via menu de contexto.
-    - Pendente: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo).
 
 **Bugs identificados** (🟢 corrigido, com issue linkada · sem marcação = ainda sem issue, abrir uma antes de corrigir, conforme workflow em `CLAUDE.md`):
 
@@ -61,20 +57,33 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - 🟢 É possível criar pastas/documentos/capítulos com o mesmo nome e, ao renomear, preenche o campo com o nome original ([#7](https://github.com/GuilhermeSGodoy/caffeine/issues/7))
 - 🟢 É possível criar capítulos dentro de capítulos (seria melhor se capítulos fossem o fim do ramo da árvore) ([#11](https://github.com/GuilhermeSGodoy/caffeine/issues/11))
 - 🟢 Menu lateral cresce em largura conforme o tamanho do conteúdo, em vez de ter largura fixa com rolagem horizontal ([#13](https://github.com/GuilhermeSGodoy/caffeine/issues/13))
+- Comportamentos inconsistentes na quebra de páginas usando Ctrl + Enter: Ctrl + Enter numa página vazia não cria uma nova página, mas se eu tiver um caractere ou até mesmo uma linha em branco, a página é criada. Além disso, se eu volto numa página que já tem uma página seguinte, ao usar Ctrl + Enter, uma nova página entre a atual e a seguinte não é criada, apenas pulando o curso para a página que já existe.
 
 **Demandas adicionais identificadas durante o desenvolvimento/validação** (fora da lista original; ainda sem issue — abrir uma antes de trabalhar, conforme workflow em `CLAUDE.md`):
 
+- 🟢 Avançado: criação de paginação padrão com margens pré-definidas em formato A4 e adicionar contagem de páginas total. ([#15](https://github.com/GuilhermeSGodoy/caffeine/issues/15))
+  - Folha A4 visual centralizada com margens de 2,5cm, contagem de páginas no cabeçalho, quebra manual (`Ctrl+Enter`) e automática por bloco (nunca no meio de um parágrafo — bloco que não cabe migra inteiro para a próxima página), alinhamento de texto configurável (esquerda/direita/centro/justificado) e cor de espaço vazio mais escura por tema.
+  - Limitações conhecidas: quebra automática só entre blocos (não há split no meio de um parágrafo, podendo deixar espaço em branco no fim de uma página); recálculo de layout é O(n) sobre todos os blocos a cada edição, podendo gerar jank em documentos muito longos; redimensionar a janela recalcula todas as quebras; um bloco maior que uma página inteira ainda estoura visualmente, sem tentativa de split; nenhuma paridade garantida com a futura exportação em PDF via QuestPDF (motor de layout independente). Evolução para quebra inteligente por linha registrada como demanda na Fase 2.
 - UX das ações de criar/renomear/excluir na árvore hoje usa `window.prompt`/`window.confirm` do navegador como placeholder — precisa ser substituído por diálogos do PrimeNG (`p-dialog`) antes de considerar a Fase 1 pronta para uso real.
 - Bundle inicial do frontend passou do orçamento padrão do Angular (500kB) por causa do PrimeNG + Tiptap; o limite foi ajustado para 2MB em `angular.json` como solução temporária — vale revisitar com lazy loading de features antes de ir para produção.
 - A janela do Electron não pôde ser validada visualmente durante o desenvolvimento (ambiente headless usado para implementar); validar manualmente com `./scripts/dev-electron.ps1`.
 - Interface para visualização de projetos e documentos, além do menu lateral.
+- Mover documentos entre pastas pela UI (drag-and-drop) — hoje só é possível via chamada direta à API (`PUT /api/nodes/{id}`); a validação de regras de movimentação já existe no backend.
 - Edição de nomes de pastas/documentos/capítulos inline, além da opção de clique com mouse.
 - Refinar temas existentes e criar novas opções.
 - Documentação/Swagger da API.
 - Lixeira de pastas/documentos/capítulos, com opção de restauração para o escopo original.
 - 🟢 Infraestrutura de testes E2E com Playwright, para validar layout/DOM real de navegador (identificada durante a investigação da #15, onde jsdom não conseguia flagrar o bug de renderização) ([#18](https://github.com/GuilhermeSGodoy/caffeine/issues/18))
 - Estilizar e ajustar padding/overflow das barras de scroll do menu lateral.
-- Salvar estado das pastas/documentos expandidos no menu lateral
+- Salvar estado das pastas/documentos expandidos no menu lateral.
+- Trocar nome do frontend de "Frontend" para "Caffeine" e adicionar um ícone customizado.
+- Definir nova fonte padrão para o sistema.
+- Auto-save: tornar o intervalo configurável pelo usuário (hoje é fixo no código).
+- Atalhos do teclado: `Ctrl+P` e demais atalhos do produto; painel de ajuda/listagem de atalhos.
+- Hover nos itens do menu lateral e botão de configurações.
+- Configurações de página/editor de texto: hifenização automática.
+- Configurações de página/editor de texto: espaçamento entre linhas e parágrafos.
+- Avançado: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo). Avaliar a criação de estruturas diferentes de documento: um sem a adição de capítulos internos, e outro em que o documento principal serve como uma estrutura para unir os capítulos internos num único documento, conforme preferência do usuário (possibilidade de usar drag-and-drop para a organização do conteúdo).
 
 ### Fase 2
 
@@ -89,6 +98,9 @@ Todos os itens ⚪ **Não iniciado**.
 7. ⚪ Exportação em PDF (complementando o formato A4, ebook ou outros formatos convenientes), com fundo branco, respeitando formatação do texto, quebra de páginas, espaçamentos e união dos diferentes blocos/capítulos/sub abas do documento
 8. ⚪ Índice inteligente interno do documento, gerado automaticamente
 9. ⚪ Adicionar opções de responsividade.
+10. ⚪ Sincronização com nuvem (não criar uma sincronização nativa, verificar a possibilidade de salvar/fazer backups periódicos/recuperar backups quando necessário no Google Drive ou OneDrive).
+11. ⚪ Avançado: evoluir a paginação da Fase 1 (hoje com quebra automática por bloco) para quebra de página inteligente por linha, no nível de um editor de texto tradicional — quebra exatamente no limite disponível, inclusive no meio de um parágrafo, sem deixar espaço vazio evitável no fim de uma página. Envolve: medição por linha via `Range.getClientRects()` do DOM real do ProseMirror (não só a altura total do bloco); aplicação via Decorations do ProseMirror em vez de manipulação direta de `marginBottom`; recálculo incremental a partir da posição alterada pela transação (`transaction.mapping`), em vez de remedir o documento inteiro a cada edição; tratamento de blocos indivisíveis (imagens, tabelas) que continuam migrando inteiros para a próxima página mesmo com o motor de linha. Mesmo com essa evolução, não há garantia de paridade pixel-perfect com a paginação da exportação em PDF via QuestPDF — motor de layout do Chromium e motor de layout do QuestPDF/.NET nunca terão exatamente as mesmas métricas de fonte/kerning/hinting; a exportação em PDF continuará dependendo da própria paginação do QuestPDF, independente do que for feito aqui.
+    - Decisão de arquitetura registrada para quando essa demanda for atacada: permanecer sobre Tiptap/ProseMirror + `contentEditable` do navegador como fonte de layout (evolução incremental do motor atual), e não migrar para um renderer bespoke baseado em `<canvas>` com motor de tipografia próprio (abordagem adotada pelo Google Docs desde ~2021, abandonando `contentEditable`). A alternativa de canvas dá controle total sobre quebra de linha sem depender do layout engine do navegador, mas é uma reescrita de múltiplas semanas/meses que descarta boa parte do ecossistema de extensões, acessibilidade nativa, IME e seleção que o Tiptap já resolve — desproporcional para o escopo deste app desktop single-user. Reavaliar essa decisão só se o motor incremental (Decorations + `Range.getClientRects()`) se mostrar insuficiente na prática.
 
 ### Fase 3
 

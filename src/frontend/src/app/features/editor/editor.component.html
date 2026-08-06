@@ -1,7 +1,7 @@
 <div class="editor">
   @if (store.openNodeId()) {
     <div class="editor__status">
-      <span>{{ store.wordCount() }} palavras · {{ store.charCount() }} caracteres</span>
+      <span>{{ store.wordCount() }} palavras · {{ store.charCount() }} caracteres · {{ paginationEngine.pageCount() }} páginas</span>
       <span class="editor__save-status">
         @if (store.saving()) {
           Salvando...
@@ -12,9 +12,24 @@
         }
       </span>
     </div>
+    <app-editor-toolbar [editor]="editorInstance()" [activeAlignment]="activeAlignment()" />
   } @else {
     <div class="editor__placeholder">Selecione um documento ou capítulo na árvore para começar a escrever.</div>
   }
 
-  <div #editorHost class="editor__content"></div>
+  <div
+    class="editor__content"
+    [hidden]="!store.openNodeId()"
+    [style.--page-surround-color]="pageSurroundColor()"
+    [style.--page-width-px.px]="pageWidthPx"
+    [style.--page-height-px.px]="pageHeightPx"
+    [style.--page-margin-top-px.px]="pageMarginTopPx"
+    [style.--page-margin-bottom-px.px]="pageMarginBottomPx"
+    [style.--page-margin-left-px.px]="pageMarginLeftPx"
+    [style.--page-margin-right-px.px]="pageMarginRightPx"
+    [style.--page-gap-px.px]="pageGapPx"
+    [style.--page-stack-min-height-px.px]="pageStackMinHeightPx()"
+  >
+    <div #editorHost class="editor__page-stack"></div>
+  </div>
 </div>

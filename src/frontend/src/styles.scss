@@ -8,9 +8,59 @@ html, body {
   color: var(--p-text-color);
 }
 
-.editor__content .tiptap {
-  min-height: 100%;
+.editor__page-stack .tiptap {
+  width: var(--page-width-px, 794px);
+  /* Precisa escalar com o número de páginas (N × altura-da-página + (N-1) × vão), não ficar fixo
+     em uma única página — senão a última página em criação nasce menor que uma A4 completa e só
+     "cresce" visualmente conforme mais conteúdo é digitado nela (o gradiente abaixo só é pintado
+     dentro da altura real da caixa). */
+  min-height: var(--page-stack-min-height-px, 1123px);
+  padding: var(--page-margin-top-px, 94px) var(--page-margin-right-px, 94px) var(--page-margin-bottom-px, 94px)
+    var(--page-margin-left-px, 94px);
+  /* page-layout.constants.ts calcula PAGE_CONTENT_HEIGHT_PX subtraindo o padding da altura da
+     página — isso só é verdade se o padding for incluído dentro do min-height (border-box), não
+     somado por fora (content-box, padrão do navegador). */
+  box-sizing: border-box;
   outline: none;
+
+  /* O motor de paginação (pagination-engine.service.ts) mede a altura de cada bloco via
+     getBoundingClientRect, que não inclui margens — e controla todo o espaçamento vertical
+     (entre blocos e entre páginas) através de marginBottom aplicado por ele mesmo. Margens
+     padrão do navegador em blocos (parágrafos, títulos, listas) ficariam de fora dessa
+     medição, fazendo o conteúdo real ocupar mais espaço do que o calculado e estourar o
+     limite da página. */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  blockquote,
+  ul,
+  ol,
+  li,
+  pre {
+    margin: 0;
+  }
+
+  /* Simula folhas A4 empilhadas: cada ciclo do gradiente pinta uma folha inteira (margens +
+     conteúdo) na cor de fundo do tema, seguida de um vão decorativo na cor de "espaço vazio"
+     do tema — dando a ilusão de páginas separadas dentro de um único contenteditable contínuo. */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--p-content-background) 0,
+    var(--p-content-background) var(--page-height-px, 1123px),
+    var(--page-surround-color, transparent) var(--page-height-px, 1123px),
+    var(--page-surround-color, transparent) calc(var(--page-height-px, 1123px) + var(--page-gap-px, 32px))
+  );
+  background-size: 100% calc(var(--page-height-px, 1123px) + var(--page-gap-px, 32px));
+}
+
+.editor__page-stack .page-break {
+  height: 0;
+  margin: 0;
+  overflow: hidden;
 }
 
 .project-tree__toolbar .p-button {
