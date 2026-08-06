@@ -22,6 +22,10 @@
   &__content {
     flex: 1;
     overflow: auto;
+    // Faz o scroll para a nova página (Ctrl+Enter, page-break.extension.ts) animar suavemente em
+    // vez de saltar direto — a mudança de scrollTop em si continua síncrona (necessário para os
+    // testes, que rodam em jsdom sem suporte a Element.scrollTo), só a apresentação visual anima.
+    scroll-behavior: smooth;
     // Reserva o espaço da barra de rolagem mesmo quando ela não é necessária. Sem isso, o
     // motor de paginação entra em loop de realimentação: inserir uma margem de quebra de
     // página aumenta a altura do conteúdo, o que faz a barra aparecer, o que reduz a largura
