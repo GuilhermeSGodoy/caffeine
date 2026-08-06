@@ -103,6 +103,30 @@ describe('EditorComponent', () => {
     expect(breaks).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: expect.any(Number) }]);
   });
 
+  it('a altura mínima da pilha de páginas escala com o número de páginas, não fica fixa em uma folha', () => {
+    const fixture = createAndOpen();
+    const component = fixture.componentInstance as unknown as {
+      pageStackMinHeightPx: () => number;
+      pageHeightPx: number;
+      pageGapPx: number;
+    };
+
+    paginationEngine.blockMeasurer = () => [
+      { index: 0, heightPx: 2000, forcedBreakBefore: false },
+      { index: 1, heightPx: 100, forcedBreakBefore: false }
+    ];
+    paginationEngine.computeBreaks(document.createElement('div'));
+    fixture.detectChanges();
+
+    expect(paginationEngine.pageCount()).toBe(2);
+    expect(component.pageStackMinHeightPx()).toBe(2 * component.pageHeightPx + 1 * component.pageGapPx);
+
+    const content = fixture.nativeElement.querySelector('.editor__content') as HTMLElement;
+    expect(content.style.getPropertyValue('--page-stack-min-height-px')).toBe(
+      `${2 * component.pageHeightPx + 1 * component.pageGapPx}px`
+    );
+  });
+
   it('recalcula a paginação ao abrir um documento diferente, mesmo sem edição subsequente', async () => {
     const fixture = createAndOpen();
     const computeBreaksSpy = vi.spyOn(paginationEngine, 'computeBreaks');

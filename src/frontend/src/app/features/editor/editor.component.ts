@@ -5,6 +5,7 @@ import {
   HostListener,
   OnDestroy,
   ViewChild,
+  computed,
   effect,
   inject,
   signal
@@ -57,6 +58,16 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   protected readonly pageMarginLeftPx = PAGE_MARGIN_LEFT_PX;
   protected readonly pageMarginRightPx = PAGE_MARGIN_RIGHT_PX;
   protected readonly pageGapPx = PAGE_GAP_PX;
+
+  // O CSS pinta o gradiente de folhas A4 empilhadas em ciclos fixos de pageHeightPx + pageGapPx,
+  // mas o min-height do container só cresce com a altura intrínseca do conteúdo — sem isso, a
+  // última página em criação nasce menor que uma A4 completa e só "cresce" conforme mais texto é
+  // digitado nela. Este valor força o container a sempre ocupar o espaço de N páginas inteiras.
+  protected readonly pageStackMinHeightPx = computed(
+    () =>
+      this.paginationEngine.pageCount() * this.pageHeightPx +
+      (this.paginationEngine.pageCount() - 1) * this.pageGapPx
+  );
 
   private editor: Editor | null = null;
   private lastLoadedNodeId: string | null = null;

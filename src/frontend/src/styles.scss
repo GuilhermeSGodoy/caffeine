@@ -10,7 +10,11 @@ html, body {
 
 .editor__page-stack .tiptap {
   width: var(--page-width-px, 794px);
-  min-height: var(--page-height-px, 1123px);
+  /* Precisa escalar com o número de páginas (N × altura-da-página + (N-1) × vão), não ficar fixo
+     em uma única página — senão a última página em criação nasce menor que uma A4 completa e só
+     "cresce" visualmente conforme mais conteúdo é digitado nela (o gradiente abaixo só é pintado
+     dentro da altura real da caixa). */
+  min-height: var(--page-stack-min-height-px, 1123px);
   padding: var(--page-margin-top-px, 94px) var(--page-margin-right-px, 94px) var(--page-margin-bottom-px, 94px)
     var(--page-margin-left-px, 94px);
   /* page-layout.constants.ts calcula PAGE_CONTENT_HEIGHT_PX subtraindo o padding da altura da
