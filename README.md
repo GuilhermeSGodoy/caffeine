@@ -65,6 +65,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
   - Folha A4 visual centralizada com margens de 2,5cm, contagem de páginas no cabeçalho, quebra manual (`Ctrl+Enter`) e automática por bloco (nunca no meio de um parágrafo — bloco que não cabe migra inteiro para a próxima página), alinhamento de texto configurável (esquerda/direita/centro/justificado) e cor de espaço vazio mais escura por tema.
   - Limitações conhecidas: quebra automática só entre blocos (não há split no meio de um parágrafo, podendo deixar espaço em branco no fim de uma página); recálculo de layout é O(n) sobre todos os blocos a cada edição, podendo gerar jank em documentos muito longos; redimensionar a janela recalcula todas as quebras; um bloco maior que uma página inteira ainda estoura visualmente, sem tentativa de split; nenhuma paridade garantida com a futura exportação em PDF via QuestPDF (motor de layout independente). Evolução para quebra inteligente por linha registrada como demanda na Fase 2.
 - UX das ações de criar/renomear/excluir na árvore hoje usa `window.prompt`/`window.confirm` do navegador como placeholder — precisa ser substituído por diálogos do PrimeNG (`p-dialog`) antes de considerar a Fase 1 pronta para uso real.
+- Seleção de múltiplos itens com Ctrl e possibilitar deleção múltipla.
 - Bundle inicial do frontend passou do orçamento padrão do Angular (500kB) por causa do PrimeNG + Tiptap; o limite foi ajustado para 2MB em `angular.json` como solução temporária — vale revisitar com lazy loading de features antes de ir para produção.
 - A janela do Electron não pôde ser validada visualmente durante o desenvolvimento (ambiente headless usado para implementar); validar manualmente com `./scripts/dev-electron.ps1`.
 - Interface para visualização de projetos e documentos, além do menu lateral.
@@ -83,6 +84,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Hover nos itens do menu lateral e botão de configurações.
 - Configurações de página/editor de texto: hifenização automática.
 - Configurações de página/editor de texto: espaçamento entre linhas e parágrafos.
+- Aplicação de Zoom no editor de texto (e preview, se estiver implementado).
 - Avançado: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo). Avaliar a criação de estruturas diferentes de documento: um sem a adição de capítulos internos, e outro em que o documento principal serve como uma estrutura para unir os capítulos internos num único documento, conforme preferência do usuário (possibilidade de usar drag-and-drop para a organização do conteúdo).
 
 ### Fase 2
