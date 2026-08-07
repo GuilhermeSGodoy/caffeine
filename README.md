@@ -59,7 +59,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - 🟢 Menu lateral cresce em largura conforme o tamanho do conteúdo, em vez de ter largura fixa com rolagem horizontal ([#13](https://github.com/GuilhermeSGodoy/caffeine/issues/13))
 - 🟢 Comportamentos inconsistentes na quebra de páginas usando Ctrl + Enter: Ctrl + Enter numa página vazia não cria uma nova página, mas se eu tiver um caractere ou até mesmo uma linha em branco, a página é criada. Além disso, se eu volto numa página que já tem uma página seguinte, ao usar Ctrl + Enter, uma nova página entre a atual e a seguinte não é criada, apenas pulando o curso para a página que já existe. ([#28](https://github.com/GuilhermeSGodoy/caffeine/issues/28))
 - 🟢 Ctrl + Enter numa página vazia não cria uma nova página (Ctrl + Enter funciona apenas se tiver pelo menos um caractere ou linha vazia na página). ([#30](https://github.com/GuilhermeSGodoy/caffeine/issues/30))
-- Ao excluir um documento, ele continua visível na interface (deveria voltar para a tela inicial com a mensagem "Selecione um documento ou capítulo na árvore para começar a escrever.").
+- 🟢 Ao excluir um documento, ele continua visível na interface (deveria voltar para a tela inicial com a mensagem "Selecione um documento ou capítulo na árvore para começar a escrever."). ([#32](https://github.com/GuilhermeSGodoy/caffeine/issues/32))
 
 **Demandas adicionais identificadas durante o desenvolvimento/validação** (fora da lista original; ainda sem issue — abrir uma antes de trabalhar, conforme workflow em `CLAUDE.md`):
 
