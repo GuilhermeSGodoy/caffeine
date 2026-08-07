@@ -84,6 +84,16 @@ describe('EditorComponent', () => {
     expect(json.content[0].attrs.textAlign).toBe('center');
   });
 
+  it('Ctrl+F abre o diálogo de busca e substituição', () => {
+    const fixture = createAndOpen();
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'f', ctrlKey: true, bubbles: true }));
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance as unknown as { searchDialogVisible: () => boolean };
+    expect(component.searchDialogVisible()).toBe(true);
+  });
+
   it('decide as quebras de página com alturas medidas mockadas sem depender de layout real', () => {
     createAndOpen();
 

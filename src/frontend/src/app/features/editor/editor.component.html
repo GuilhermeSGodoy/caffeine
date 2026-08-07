@@ -12,7 +12,16 @@
         }
       </span>
     </div>
-    <app-editor-toolbar [editor]="editorInstance()" [activeAlignment]="activeAlignment()" />
+    <app-editor-toolbar
+      [editor]="editorInstance()"
+      [activeAlignment]="activeAlignment()"
+      (searchToggled)="searchDialogVisible.set(true)"
+    />
+    <app-search-replace-dialog
+      [editor]="editorInstance()"
+      [visible]="searchDialogVisible()"
+      (visibleChange)="searchDialogVisible.set($event)"
+    />
   } @else {
     <div class="editor__placeholder">Selecione um documento ou capítulo na árvore para começar a escrever.</div>
   }

@@ -11,4 +11,13 @@
       <i [class]="action.icon"></i>
     </button>
   }
+  <button
+    type="button"
+    class="editor-toolbar__button"
+    title="Buscar e substituir"
+    aria-label="Buscar e substituir"
+    (click)="searchToggled.emit()"
+  >
+    <i class="pi pi-search"></i>
+  </button>
 </div>

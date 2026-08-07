@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Editor } from '@tiptap/core';
 
 export interface ToolbarAction {
@@ -24,6 +24,7 @@ const ALIGNMENT_ACTIONS: ToolbarAction[] = [
 export class EditorToolbarComponent {
   readonly editor = input<Editor | null>(null);
   readonly activeAlignment = input<string>('left');
+  readonly searchToggled = output<void>();
 
   protected readonly alignmentActions = ALIGNMENT_ACTIONS;
 

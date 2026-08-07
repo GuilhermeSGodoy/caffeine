@@ -63,6 +63,16 @@ html, body {
   overflow: hidden;
 }
 
+.search-match {
+  background-color: color-mix(in srgb, var(--p-primary-color) 35%, transparent);
+  border-radius: 2px;
+}
+
+.search-match--active {
+  background-color: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
+}
+
 .project-tree__toolbar .p-button {
   margin: 0;
 }
