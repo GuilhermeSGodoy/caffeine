@@ -19,8 +19,10 @@ import { findTheme } from '../../core/theming/theme-catalog';
 import { PageBreak } from '../../core/tiptap/page-break.extension';
 import { TabIndent } from '../../core/tiptap/tab-indent.extension';
 import { PaginationExtension } from '../../core/tiptap/pagination.extension';
+import { SearchAndReplace } from '../../core/tiptap/search-and-replace.extension';
 import { PaginationEngineService } from '../../core/services/pagination-engine.service';
 import { EditorToolbarComponent } from './editor-toolbar/editor-toolbar.component';
+import { SearchReplaceDialogComponent } from './search-replace-dialog/search-replace-dialog.component';
 import {
   A4_HEIGHT_PX,
   A4_WIDTH_PX,
@@ -36,7 +38,7 @@ const RESIZE_RECALCULATION_DEBOUNCE_MS = 300;
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [EditorToolbarComponent],
+  imports: [EditorToolbarComponent, SearchReplaceDialogComponent],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss'
 })
@@ -50,6 +52,9 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   protected readonly editorInstance = signal<Editor | null>(null);
   protected readonly activeAlignment = signal('left');
   protected readonly pageSurroundColor = signal('transparent');
+  protected readonly searchDialogVisible = signal(false);
+  protected readonly searchRequest = signal<{ term: string; id: number } | null>(null);
+  private searchRequestId = 0;
 
   protected readonly pageWidthPx = A4_WIDTH_PX;
   protected readonly pageHeightPx = A4_HEIGHT_PX;
@@ -98,7 +103,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
         PageBreak,
         TabIndent,
         TextAlign.configure({ types: ['heading', 'paragraph'] }),
-        PaginationExtension.configure({ paginationEngine: this.paginationEngine })
+        PaginationExtension.configure({ paginationEngine: this.paginationEngine }),
+        SearchAndReplace
       ],
       content: JSON.parse(this.store.contentJson()),
       onUpdate: ({ editor }) => {
@@ -134,6 +140,24 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
       event.preventDefault();
       this.store.saveNow();
+    }
+
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'f') {
+      event.preventDefault();
+
+      const selection = this.editor?.state.selection;
+      const selectedText =
+        this.editor && selection && !selection.empty
+          ? this.editor.state.doc.textBetween(selection.from, selection.to, ' ')
+          : '';
+
+      // Só substitui o termo de busca do diálogo quando há texto selecionado — sem seleção, um
+      // Ctrl+F repetido não deve apagar o que o usuário já tinha digitado na busca.
+      if (selectedText) {
+        this.searchRequestId += 1;
+        this.searchRequest.set({ term: selectedText, id: this.searchRequestId });
+      }
+      this.searchDialogVisible.set(true);
     }
   }
 

@@ -1,0 +1,48 @@
+<p-dialog
+  header="Buscar e substituir"
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="false"
+  [style]="{ width: '26rem' }"
+>
+  <div class="search-replace-dialog__field">
+    <input
+      pInputText
+      type="text"
+      placeholder="Buscar"
+      [value]="searchTerm()"
+      (input)="onSearchTermChange($any($event.target).value)"
+      class="search-replace-dialog__input"
+    />
+    <span class="search-replace-dialog__count">
+      @if (matchCount() > 0) {
+        {{ activeMatchIndex() + 1 }} de {{ matchCount() }}
+      } @else {
+        Nenhum resultado
+      }
+    </span>
+  </div>
+
+  <label class="search-replace-dialog__checkbox">
+    <input type="checkbox" [checked]="caseSensitive()" (change)="onCaseSensitiveChange($any($event.target).checked)" />
+    Diferenciar maiúsculas/minúsculas
+  </label>
+
+  <div class="search-replace-dialog__field">
+    <input
+      pInputText
+      type="text"
+      placeholder="Substituir por"
+      [value]="replaceTerm()"
+      (input)="replaceTerm.set($any($event.target).value)"
+      class="search-replace-dialog__input"
+    />
+  </div>
+
+  <div class="search-replace-dialog__actions">
+    <p-button icon="pi pi-chevron-up" size="small" severity="secondary" [text]="true" [disabled]="matchCount() === 0" (onClick)="previousMatch()" />
+    <p-button icon="pi pi-chevron-down" size="small" severity="secondary" [text]="true" [disabled]="matchCount() === 0" (onClick)="nextMatch()" />
+    <p-button label="Substituir" size="small" severity="secondary" [disabled]="matchCount() === 0" (onClick)="replaceCurrent()" />
+    <p-button label="Substituir tudo" size="small" [disabled]="matchCount() === 0" (onClick)="replaceAll()" />
+  </div>
+</p-dialog>
