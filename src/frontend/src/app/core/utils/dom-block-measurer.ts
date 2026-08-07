@@ -8,20 +8,20 @@ export type BlockMeasurer = (tiptapRoot: HTMLElement) => BlockMeasurement[];
 export const measureBlocksFromDom: BlockMeasurer = (tiptapRoot) => {
   const children = Array.from(tiptapRoot.children) as HTMLElement[];
   const measurements: BlockMeasurement[] = [];
-  let forcedBreakBeforeNext = false;
+  let forcedBreakCount = 0;
 
   children.forEach((child) => {
     if (child.getAttribute(PAGE_BREAK_ATTRIBUTE) === PAGE_BREAK_VALUE) {
-      forcedBreakBeforeNext = true;
+      forcedBreakCount += 1;
       return;
     }
 
     measurements.push({
       index: measurements.length,
       heightPx: child.getBoundingClientRect().height,
-      forcedBreakBefore: forcedBreakBeforeNext
+      forcedBreakCount
     });
-    forcedBreakBeforeNext = false;
+    forcedBreakCount = 0;
   });
 
   return measurements;

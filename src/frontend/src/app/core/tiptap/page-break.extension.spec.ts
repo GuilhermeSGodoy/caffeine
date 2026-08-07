@@ -1,6 +1,9 @@
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { PageBreak } from './page-break.extension';
+import { PaginationExtension } from './pagination.extension';
+import { PaginationEngineService } from '../services/pagination-engine.service';
+import { measureBlocksFromDom } from '../utils/dom-block-measurer';
 import { PAGE_MARGIN_TOP_PX } from '../utils/page-layout.constants';
 
 describe('PageBreak extension', () => {
@@ -68,8 +71,18 @@ describe('PageBreak extension', () => {
     container.remove();
   });
 
-  it('cria uma página nova em branco ao pressionar Mod-Enter num parágrafo vazio único no documento', () => {
-    const emptyEditor = new Editor({ extensions: [StarterKit, PageBreak], content: '<p></p>' });
+  it('cria uma página nova em branco ao pressionar Mod-Enter num parágrafo vazio único no documento', async () => {
+    // blockMeasurer é stubado (o jsdom não calcula getBoundingClientRect) para que a paginação
+    // visual reconheça a quebra manual mesmo caindo no primeiro bloco do documento — a única
+    // forma de esse teste pegar o bug de "página inicial vazia" na camada visual, não só no
+    // modelo do ProseMirror.
+    const paginationEngine = new PaginationEngineService();
+    paginationEngine.blockMeasurer = () => [{ index: 0, heightPx: 50, forcedBreakCount: 1 }];
+
+    const emptyEditor = new Editor({
+      extensions: [StarterKit, PageBreak, PaginationExtension.configure({ paginationEngine })],
+      content: '<p></p>'
+    });
 
     emptyEditor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true }));
 
@@ -79,6 +92,35 @@ describe('PageBreak extension', () => {
     const { selection } = emptyEditor.state;
     expect(selection.$from.parent.type.name).toBe('paragraph');
     expect(selection.$from.parent.content.size).toBe(0);
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(paginationEngine.pageCount()).toBe(2);
+
+    emptyEditor.destroy();
+  });
+
+  it('cria a página 3 ao pressionar Mod-Enter de novo, ainda sobre o parágrafo vazio da página 2, num documento que começou totalmente vazio', async () => {
+    // blockMeasurer envolve a medição REAL do DOM (só sobrescrevendo heightPx, já que jsdom não
+    // calcula layout) para exercitar de verdade a contagem de quebras manuais consecutivas — é
+    // essa contagem (não um stub estático) que precisa refletir cada Ctrl+Enter adicional.
+    const paginationEngine = new PaginationEngineService();
+    paginationEngine.blockMeasurer = (root) => measureBlocksFromDom(root).map((measurement) => ({ ...measurement, heightPx: 50 }));
+
+    const emptyEditor = new Editor({
+      extensions: [StarterKit, PageBreak, PaginationExtension.configure({ paginationEngine })],
+      content: '<p></p>'
+    });
+
+    emptyEditor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true }));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(paginationEngine.pageCount()).toBe(2);
+
+    emptyEditor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true }));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(paginationEngine.pageCount()).toBe(3);
+
+    const types = emptyEditor.getJSON().content?.map((node) => node.type);
+    expect(types).toEqual(['pageBreak', 'pageBreak', 'paragraph']);
 
     emptyEditor.destroy();
   });
