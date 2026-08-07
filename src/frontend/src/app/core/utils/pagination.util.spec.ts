@@ -35,10 +35,16 @@ describe('calculatePageBreaks', () => {
     expect(calculatePageBreaks(measurements, layout)).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: 932 }]);
   });
 
-  it('nunca força quebra antes do primeiro bloco do documento', () => {
-    const measurements = [block(0, 100, true)];
+  it('nunca gera quebra automática (por altura) antes do primeiro bloco do documento', () => {
+    const measurements = [block(0, 1500)];
 
     expect(calculatePageBreaks(measurements, layout)).toEqual([]);
+  });
+
+  it('força quebra manual mesmo quando ela é a primeira do documento (página inicial vazia)', () => {
+    const measurements = [block(0, 100, true)];
+
+    expect(calculatePageBreaks(measurements, layout)).toEqual([{ breakBeforeBlockIndex: 0, spacerHeightPx: 1032 }]);
   });
 
   it('gera múltiplas quebras em um documento com várias páginas', () => {

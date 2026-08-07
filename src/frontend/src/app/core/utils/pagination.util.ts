@@ -23,7 +23,10 @@ export function calculatePageBreaks(
 
   for (const block of measurements) {
     const exceedsPage = heightOnCurrentPage + block.heightPx > layout.pageHeightPx;
-    const startsNewPage = block.index > 0 && (block.forcedBreakBefore || exceedsPage);
+    // Quebra automática (por altura) nunca força uma página fantasma antes do primeiro bloco do
+    // documento — só quebra manual (forcedBreakBefore) pode abrir uma página vazia no índice 0
+    // (ex.: Ctrl+Enter na primeira página, ainda sem nenhum conteúdo antes da quebra).
+    const startsNewPage = block.forcedBreakBefore || (block.index > 0 && exceedsPage);
 
     if (startsNewPage) {
       // A faixa visual do "vão entre folhas" (gradiente em styles.scss) fica em posições fixas,

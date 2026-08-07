@@ -266,6 +266,44 @@ test('ao inserir quebra manual de página no parágrafo vazio de uma página rec
   }).toPass({ timeout: 5000 });
 });
 
+// Bug relatado: numa página completamente vazia (documento novo, sem nenhum caractere ou linha com
+// conteúdo antes da quebra), Ctrl+Enter não criava página nova — o nó pageBreak era inserido no
+// modelo, mas a camada de paginação visual suprimia qualquer quebra que caísse no bloco de índice 0,
+// e o espaçador (margin-bottom no bloco anterior) não tinha bloco anterior para se aplicar (ver
+// pagination.util.ts e pagination.extension.ts). Funcionava normalmente já com pelo menos um
+// caractere ou parágrafo vazio antes da quebra.
+test('ao inserir quebra manual de página numa página completamente vazia, uma página nova é criada', async ({
+  page,
+  request
+}) => {
+  const { editorContent, tiptap } = await openDocumentWithContent(page, request, `pagina-vazia-${Date.now()}`, '');
+
+  await tiptap.click();
+  await expect(tiptap).toHaveClass(/ProseMirror-focused/);
+
+  const pageBreaks = tiptap.locator('[data-type="page-break"]');
+  const paragraphs = tiptap.locator('p');
+  const status = page.locator('.editor__status');
+
+  await expect(status).toContainText('1 páginas');
+
+  const scrollTopBeforeBreak = await editorContent.evaluate((el) => el.scrollTop);
+
+  await page.keyboard.press('Control+Enter');
+
+  await expect(pageBreaks).toHaveCount(1);
+  await expect(paragraphs).toHaveCount(1);
+  await expect(status).toContainText('2 páginas');
+
+  await page.keyboard.type('Texto na página nova.');
+  await expect(paragraphs.last()).toHaveText('Texto na página nova.');
+
+  await expect(async () => {
+    const scrollTop = await editorContent.evaluate((el) => el.scrollTop);
+    expect(scrollTop).toBeGreaterThan(scrollTopBeforeBreak);
+  }).toPass({ timeout: 5000 });
+});
+
 // Bug relatado: ao voltar o cursor para uma página que já tem uma página seguinte (com conteúdo) e
 // apertar Ctrl+Enter, nenhuma página nova era criada — o cursor apenas pulava para a página
 // seguinte já existente (ver page-break.extension.ts). Este teste garante que uma página nova de

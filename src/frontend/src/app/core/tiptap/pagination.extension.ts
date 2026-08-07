@@ -22,14 +22,26 @@ function buildDecorations(view: EditorView, paginationEngine: PaginationEngineSe
       return;
     }
 
-    const decision = breaks.find((candidate) => candidate.breakBeforeBlockIndex - 1 === blockIndex);
-    if (decision) {
-      decorations.push(
-        Decoration.node(offset, offset + node.nodeSize, {
-          style: `margin-bottom: ${decision.spacerHeightPx}px`
-        })
-      );
+    const styles: string[] = [];
+
+    // Quebra forçada no início do documento (página inicial vazia): não há bloco anterior para
+    // receber margin-bottom, então o espaçador vira margin-top no próprio primeiro bloco.
+    if (blockIndex === 0) {
+      const breakAtStart = breaks.find((candidate) => candidate.breakBeforeBlockIndex === 0);
+      if (breakAtStart) {
+        styles.push(`margin-top: ${breakAtStart.spacerHeightPx}px`);
+      }
     }
+
+    const breakAfter = breaks.find((candidate) => candidate.breakBeforeBlockIndex - 1 === blockIndex);
+    if (breakAfter) {
+      styles.push(`margin-bottom: ${breakAfter.spacerHeightPx}px`);
+    }
+
+    if (styles.length > 0) {
+      decorations.push(Decoration.node(offset, offset + node.nodeSize, { style: styles.join('; ') }));
+    }
+
     blockIndex += 1;
   });
 
