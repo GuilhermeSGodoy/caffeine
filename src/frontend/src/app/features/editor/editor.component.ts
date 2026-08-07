@@ -53,6 +53,8 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   protected readonly activeAlignment = signal('left');
   protected readonly pageSurroundColor = signal('transparent');
   protected readonly searchDialogVisible = signal(false);
+  protected readonly searchRequest = signal<{ term: string; id: number } | null>(null);
+  private searchRequestId = 0;
 
   protected readonly pageWidthPx = A4_WIDTH_PX;
   protected readonly pageHeightPx = A4_HEIGHT_PX;
@@ -142,6 +144,19 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
 
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'f') {
       event.preventDefault();
+
+      const selection = this.editor?.state.selection;
+      const selectedText =
+        this.editor && selection && !selection.empty
+          ? this.editor.state.doc.textBetween(selection.from, selection.to, ' ')
+          : '';
+
+      // Só substitui o termo de busca do diálogo quando há texto selecionado — sem seleção, um
+      // Ctrl+F repetido não deve apagar o que o usuário já tinha digitado na busca.
+      if (selectedText) {
+        this.searchRequestId += 1;
+        this.searchRequest.set({ term: selectedText, id: this.searchRequestId });
+      }
       this.searchDialogVisible.set(true);
     }
   }

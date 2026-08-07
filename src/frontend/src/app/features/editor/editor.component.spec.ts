@@ -94,6 +94,19 @@ describe('EditorComponent', () => {
     expect(component.searchDialogVisible()).toBe(true);
   });
 
+  it('Ctrl+F com texto selecionado preenche automaticamente o campo de busca com a seleção', () => {
+    const fixture = createAndOpen();
+    const component = fixture.componentInstance as unknown as { editor: { commands: { setTextSelection: (range: { from: number; to: number }) => void } } };
+
+    component.editor.commands.setTextSelection({ from: 1, to: 4 });
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'f', ctrlKey: true, bubbles: true }));
+    fixture.detectChanges();
+
+    const nativeElement = fixture.nativeElement as HTMLElement;
+    const searchInput = nativeElement.querySelector<HTMLInputElement>('input[placeholder="Buscar"]');
+    expect(searchInput?.value).toBe('Ola');
+  });
+
   it('decide as quebras de página com alturas medidas mockadas sem depender de layout real', () => {
     createAndOpen();
 

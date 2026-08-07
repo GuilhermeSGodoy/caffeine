@@ -87,4 +87,31 @@ describe('SearchReplaceDialogComponent', () => {
     expect(editor.storage.searchAndReplace.searchTerm).toBe('');
     expect(editor.storage.searchAndReplace.matches).toHaveLength(0);
   });
+
+  it('preenche o campo de busca a partir de searchRequest (ex.: Ctrl+F com texto selecionado)', () => {
+    const fixture = TestBed.createComponent(SearchReplaceDialogComponent);
+    fixture.componentRef.setInput('editor', editor);
+    fixture.componentRef.setInput('searchRequest', { term: 'cachorro', id: 1 });
+    fixture.componentRef.setInput('visible', true);
+    fixture.detectChanges();
+
+    const nativeElement = fixture.nativeElement as HTMLElement;
+    expect(inputByPlaceholder(nativeElement, 'Buscar').value).toBe('cachorro');
+  });
+
+  it('não sobrescreve o que o usuário digitou depois de um searchRequest anterior', () => {
+    const fixture = TestBed.createComponent(SearchReplaceDialogComponent);
+    fixture.componentRef.setInput('editor', editor);
+    fixture.componentRef.setInput('searchRequest', { term: 'cachorro', id: 1 });
+    fixture.componentRef.setInput('visible', true);
+    fixture.detectChanges();
+
+    const nativeElement = fixture.nativeElement as HTMLElement;
+    const searchInput = inputByPlaceholder(nativeElement, 'Buscar');
+    searchInput.value = 'gato';
+    searchInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(inputByPlaceholder(nativeElement, 'Buscar').value).toBe('gato');
+  });
 });

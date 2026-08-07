@@ -75,6 +75,23 @@ describe('SearchAndReplace extension', () => {
     expect(storage().matches).toHaveLength(1);
   });
 
+  it('replaceCurrent avança para a próxima ocorrência distinta mesmo quando o texto substituto também contém o termo buscado', () => {
+    editor = new Editor({ extensions: [StarterKit, SearchAndReplace], content: '<p>casa casa</p>' });
+    editor.commands.search('casa');
+
+    editor.commands.replaceCurrent('casamento');
+    // "casamento" também contém "casa" como prefixo, então continua havendo 2 ocorrências no
+    // texto — mas, sem a correção, o índice ativo ficaria travado apontando para esse match
+    // recém-criado (posição 0) em vez de avançar para a próxima ocorrência real (a segunda
+    // palavra "casa"), obrigando o usuário a navegar manualmente para não ficar preso no lugar.
+    expect(editor.getText()).toBe('casamento casa');
+    expect(storage().matches).toHaveLength(2);
+    expect(storage().activeMatchIndex).toBe(1);
+
+    editor.commands.replaceCurrent('casamento');
+    expect(editor.getText()).toBe('casamento casamento');
+  });
+
   it('replaceAll substitui todas as ocorrências numa única transação', () => {
     editor = new Editor({ extensions: [StarterKit, SearchAndReplace], content: '<p>gato gato gato</p>' });
     editor.commands.search('gato');

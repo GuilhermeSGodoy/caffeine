@@ -189,11 +189,17 @@ export const SearchAndReplace = Extension.create<Record<string, never>, SearchAn
 
           if (dispatch) {
             tr.insertText(replacement, match.from, match.to);
+
+            // Se o texto de substituição também contém o termo buscado (ex.: substituir "casa"
+            // por "casamento"), o recompute abaixo encontraria de novo esse match recém-criado
+            // na mesma posição — travando o usuário sempre na primeira ocorrência. Por isso o
+            // próximo índice ativo é o primeiro match que começa DEPOIS do fim do texto inserido,
+            // pulando por cima de qualquer match que esteja dentro da própria substituição.
+            const insertionEnd = match.from + replacement.length;
             this.storage.matches = findMatches(tr.doc, this.storage.searchTerm, this.storage.caseSensitive);
-            this.storage.activeMatchIndex =
-              this.storage.matches.length > 0
-                ? Math.min(this.storage.activeMatchIndex, this.storage.matches.length - 1)
-                : -1;
+            const nextIndex = this.storage.matches.findIndex((candidate) => candidate.from >= insertionEnd);
+            this.storage.activeMatchIndex = this.storage.matches.length === 0 ? -1 : nextIndex === -1 ? 0 : nextIndex;
+
             dispatch(dispatchDecorations(tr, this.storage));
           }
           return true;

@@ -1,4 +1,4 @@
-import { Component, computed, effect, input, output, signal } from '@angular/core';
+import { Component, computed, effect, input, output, signal, untracked } from '@angular/core';
 import { Editor } from '@tiptap/core';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,6 +14,7 @@ import { ButtonModule } from 'primeng/button';
 export class SearchReplaceDialogComponent {
   readonly editor = input<Editor | null>(null);
   readonly visible = input(false);
+  readonly searchRequest = input<{ term: string; id: number } | null>(null);
   readonly visibleChange = output<boolean>();
 
   protected readonly searchTerm = signal('');
@@ -35,14 +36,26 @@ export class SearchReplaceDialogComponent {
   });
 
   constructor() {
+    // `searchTerm`/`caseSensitive`/`editor` são lidos dentro de `runSearch()` sem rastreamento
+    // (`untracked`) de propósito: este efeito só deve reagir a abrir/fechar o diálogo ou a um
+    // novo pedido de busca (`searchRequest`, ex.: Ctrl+F com texto selecionado) — não a cada
+    // tecla digitada, senão o próprio efeito reescreveria `searchTerm` de volta para o valor do
+    // último `searchRequest`, apagando o que o usuário acabou de digitar.
     effect(() => {
-      if (this.visible()) {
-        this.runSearch();
-      } else {
-        this.editor()?.commands.clearSearch();
+      const visible = this.visible();
+      const request = this.searchRequest();
+
+      if (!visible) {
         this.searchTerm.set('');
         this.replaceTerm.set('');
+        untracked(() => this.editor()?.commands.clearSearch());
+        return;
       }
+
+      if (request) {
+        this.searchTerm.set(request.term);
+      }
+      untracked(() => this.runSearch());
     });
   }
 
