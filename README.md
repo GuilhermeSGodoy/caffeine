@@ -90,6 +90,8 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Aplicação de Zoom no editor de texto (e preview, se estiver implementado).
 - Ordenação no menu lateral: padrão é por ordem de criação (crescente), mas é possível ordenar por nome (crescente ou decrescente), ordem de criação decrescente e padrão/manual em que o usuário reorganiza a ordem através de interface drag-and-drop (só tomar o cuidado para não correr o risco de mover pastas para dentro de outras pastas, talvez seja uma interface separada).
 - Scrollar pro topo ao abrir um documento.
+- Largura ajustável do menu lateral.
+- Configurações: seletor de tema fecha ao fechar as configurações.
 - Avançado: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo). Avaliar a criação de estruturas diferentes de documento: um sem a adição de capítulos internos, e outro em que o documento principal serve como uma estrutura para unir os capítulos internos num único documento, conforme preferência do usuário (possibilidade de usar drag-and-drop para a organização do conteúdo).
 
 ### Fase 2
