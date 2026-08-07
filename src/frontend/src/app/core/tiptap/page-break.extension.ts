@@ -42,17 +42,10 @@ export const PageBreak = Node.create({
   addKeyboardShortcuts() {
     return {
       'Mod-Enter': () => {
-        // insertContent() do @tiptap/core trata parágrafo vazio de forma estruturalmente diferente
-        // de parágrafo com texto: quando o parágrafo atual tem conteúdo, ele divide o bloco (nó da
-        // quebra como irmão do parágrafo, sobrando um parágrafo remanescente depois) — cenário já
-        // coberto pela correção de cursor abaixo (Selection.near com viés para trás pula o nó
-        // atômico e não-selecionável da quebra e precisa ser reancorada). Quando o parágrafo atual
-        // está VAZIO, porém, insertContent detecta "isEmptyTextBlock" e substitui o parágrafo
-        // inteiro pelo nó da quebra — não sobra nenhum parágrafo depois, então Selection.near não
-        // acha onde pousar e recua para a página anterior (e no caso de parágrafo vazio único no
-        // documento, chega a lançar RangeError). Por isso parágrafo vazio precisa de um caminho
-        // próprio: inserir a quebra ANTES do parágrafo vazio (em vez de no lugar dele), deixando-o
-        // como o primeiro parágrafo da página nova.
+        // Parágrafo vazio (isEmptyParagraph) precisa de um caminho próprio: dividir um parágrafo
+        // vazio com tr.split não sobra nada útil para ser "o parágrafo da página nova", então a
+        // quebra é inserida ANTES dele, deixando o próprio parágrafo vazio como o primeiro
+        // parágrafo da página nova (em vez de duplicá-lo).
         let scrollTargetPos: number | null = null;
 
         const { $from } = this.editor.state.selection;
@@ -77,26 +70,31 @@ export const PageBreak = Node.create({
               .run()
           : this.editor
               .chain()
-              .insertContent({ type: this.name })
               .command(({ tr, dispatch }) => {
                 if (!dispatch) {
                   return true;
                 }
 
-                const { $to } = tr.selection;
-                const afterCurrentBlock = $to.after($to.depth);
-                const maybePageBreak = tr.doc.resolve(afterCurrentBlock).nodeAfter;
+                // Divide o bloco atual no ponto do cursor com tr.split (em vez de
+                // insertContent()): produz sempre um irmão remanescente bem definido — vazio se o
+                // cursor estava no fim do bloco, com o restante do texto se estava no meio —, que
+                // passa a ser o parágrafo da página nova. Diferente de posições calculadas a partir
+                // de $to.after($to.depth) após insertContent(), tr.mapping aqui reflete só o split
+                // que acabamos de fazer, então não confunde uma quebra de página já existente mais
+                // adiante no documento com a que está sendo criada agora — o que fazia o cursor
+                // pular para dentro de uma página seguinte já existente em vez de permanecer na
+                // página nova.
+                const pos = tr.selection.$from.pos;
+                tr.split(pos);
 
-                if (maybePageBreak?.type.name === this.name) {
-                  const afterPageBreak = afterCurrentBlock + maybePageBreak.nodeSize;
+                // A posição mapeada cai DENTRO do parágrafo remanescente do split (o que vai virar
+                // a página nova) — a quebra precisa ser inserida ANTES dele, não naquela posição.
+                const $remainderStart = tr.doc.resolve(tr.mapping.map(pos, 1));
+                const insertPos = $remainderStart.before($remainderStart.depth);
+                const pageBreakNode = tr.doc.type.schema.nodes[this.name].create();
+                tr.insert(insertPos, pageBreakNode);
 
-                  if (!tr.doc.resolve(afterPageBreak).nodeAfter) {
-                    tr.insert(afterPageBreak, tr.doc.type.schema.nodes['paragraph'].create());
-                  }
-
-                  tr.setSelection(Selection.near(tr.doc.resolve(afterPageBreak), 1));
-                }
-
+                tr.setSelection(Selection.near(tr.doc.resolve(insertPos + pageBreakNode.nodeSize), 1));
                 scrollTargetPos = tr.selection.from;
                 return true;
               })

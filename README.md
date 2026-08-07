@@ -57,7 +57,9 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - 🟢 É possível criar pastas/documentos/capítulos com o mesmo nome e, ao renomear, preenche o campo com o nome original ([#7](https://github.com/GuilhermeSGodoy/caffeine/issues/7))
 - 🟢 É possível criar capítulos dentro de capítulos (seria melhor se capítulos fossem o fim do ramo da árvore) ([#11](https://github.com/GuilhermeSGodoy/caffeine/issues/11))
 - 🟢 Menu lateral cresce em largura conforme o tamanho do conteúdo, em vez de ter largura fixa com rolagem horizontal ([#13](https://github.com/GuilhermeSGodoy/caffeine/issues/13))
-- Comportamentos inconsistentes na quebra de páginas usando Ctrl + Enter: Ctrl + Enter numa página vazia não cria uma nova página, mas se eu tiver um caractere ou até mesmo uma linha em branco, a página é criada. Além disso, se eu volto numa página que já tem uma página seguinte, ao usar Ctrl + Enter, uma nova página entre a atual e a seguinte não é criada, apenas pulando o curso para a página que já existe.
+- 🟢 Comportamentos inconsistentes na quebra de páginas usando Ctrl + Enter: Ctrl + Enter numa página vazia não cria uma nova página, mas se eu tiver um caractere ou até mesmo uma linha em branco, a página é criada. Além disso, se eu volto numa página que já tem uma página seguinte, ao usar Ctrl + Enter, uma nova página entre a atual e a seguinte não é criada, apenas pulando o curso para a página que já existe. ([#28](https://github.com/GuilhermeSGodoy/caffeine/issues/28))
+- Ctrl + Enter numa página vazia não cria uma nova página (Ctrl + Enter funciona apenas se tiver pelo menos um caractere ou linha vazia na página),
+- Ao excluir um documento, ele continua visível na interface (deveria voltar para a tela inicial com a mensagem "Selecione um documento ou capítulo na árvore para começar a escrever.").
 
 **Demandas adicionais identificadas durante o desenvolvimento/validação** (fora da lista original; ainda sem issue — abrir uma antes de trabalhar, conforme workflow em `CLAUDE.md`):
 
@@ -85,6 +87,8 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Configurações de página/editor de texto: hifenização automática.
 - Configurações de página/editor de texto: espaçamento entre linhas e parágrafos.
 - Aplicação de Zoom no editor de texto (e preview, se estiver implementado).
+- Ordenação no menu lateral: padrão é por ordem de criação (crescente), mas é possível ordenar por nome (crescente ou decrescente), ordem de criação decrescente e padrão/manual em que o usuário reorganiza a ordem através de interface drag-and-drop (só tomar o cuidado para não correr o risco de mover pastas para dentro de outras pastas, talvez seja uma interface separada).
+- Scrollar pro topo ao abrir um documento.
 - Avançado: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo). Avaliar a criação de estruturas diferentes de documento: um sem a adição de capítulos internos, e outro em que o documento principal serve como uma estrutura para unir os capítulos internos num único documento, conforme preferência do usuário (possibilidade de usar drag-and-drop para a organização do conteúdo).
 
 ### Fase 2

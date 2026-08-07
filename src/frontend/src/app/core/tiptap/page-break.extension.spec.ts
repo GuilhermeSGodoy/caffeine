@@ -83,14 +83,41 @@ describe('PageBreak extension', () => {
     emptyEditor.destroy();
   });
 
-  it('cria uma segunda página em branco ao pressionar Mod-Enter duas vezes seguidas, sem voltar o cursor para a página anterior', () => {
+  it('cria uma página nova em branco ao pressionar Mod-Enter de novo no fim da página atual, sem voltar o cursor para a página anterior', () => {
     editor.commands.setTextSelection(editor.state.doc.content.size);
     editor.commands.insertContent({ type: 'pageBreak' });
 
     editor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true }));
 
+    // Uma nova página em branco é criada entre a quebra recém-criada e a página que já existia
+    // (deixada em branco pelo insertContent do setup) — nenhuma é reaproveitada como a outra.
     const types = editor.getJSON().content?.map((node) => node.type);
-    expect(types).toEqual(['paragraph', 'pageBreak', 'pageBreak', 'paragraph']);
+    expect(types).toEqual(['paragraph', 'pageBreak', 'paragraph', 'pageBreak', 'paragraph']);
+
+    const { selection } = editor.state;
+    expect(selection.$from.parent.type.name).toBe('paragraph');
+    expect(selection.$from.parent.content.size).toBe(0);
+  });
+
+  it('cria uma página nova entre a atual e uma página seguinte já existente, sem apenas mover o cursor para ela', () => {
+    // Documento já com duas páginas antes do teste: página 1 = "Antes", página 2 já existente =
+    // "Depois" — construído direto via HTML para isolar o cenário sem depender de onde o cursor
+    // pousa após um insertContent anterior.
+    editor.commands.setContent('<p>Antes</p><div data-type="page-break"></div><p>Depois</p>');
+
+    // Cursor volta para o fim do texto da página 1 (que já tem uma página seguinte com conteúdo).
+    editor.commands.setTextSelection(6);
+
+    editor.view.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true }));
+
+    const types = editor.getJSON().content?.map((node) => node.type);
+    expect(types).toEqual(['paragraph', 'pageBreak', 'paragraph', 'pageBreak', 'paragraph']);
+
+    // A página "Depois" não é tocada nem reaproveitada: ela continua depois da quebra antiga, e o
+    // cursor fica na página nova recém-criada (entre a quebra nova e a antiga), não dentro dela.
+    const paragraphs = editor.getJSON().content?.filter((node) => node.type === 'paragraph');
+    expect(paragraphs?.[0]).toMatchObject({ content: [{ text: 'Antes' }] });
+    expect(paragraphs?.[2]).toMatchObject({ content: [{ text: 'Depois' }] });
 
     const { selection } = editor.state;
     expect(selection.$from.parent.type.name).toBe('paragraph');
