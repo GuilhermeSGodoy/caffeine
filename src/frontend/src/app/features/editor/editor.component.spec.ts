@@ -88,8 +88,8 @@ describe('EditorComponent', () => {
     createAndOpen();
 
     paginationEngine.blockMeasurer = () => [
-      { index: 0, heightPx: 2000, forcedBreakBefore: false },
-      { index: 1, heightPx: 100, forcedBreakBefore: false }
+      { index: 0, heightPx: 2000, forcedBreakCount: 0 },
+      { index: 1, heightPx: 100, forcedBreakCount: 0 }
     ];
 
     const fakeRoot = document.createElement('div');
@@ -100,7 +100,7 @@ describe('EditorComponent', () => {
     const breaks = paginationEngine.computeBreaks(fakeRoot);
 
     expect(paginationEngine.pageCount()).toBe(2);
-    expect(breaks).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: expect.any(Number) }]);
+    expect(breaks).toEqual([{ breakBeforeBlockIndex: 1, spacerHeightPx: expect.any(Number), extraBlankPages: 0 }]);
   });
 
   it('a altura mínima da pilha de páginas escala com o número de páginas, não fica fixa em uma folha', () => {
@@ -112,8 +112,8 @@ describe('EditorComponent', () => {
     };
 
     paginationEngine.blockMeasurer = () => [
-      { index: 0, heightPx: 2000, forcedBreakBefore: false },
-      { index: 1, heightPx: 100, forcedBreakBefore: false }
+      { index: 0, heightPx: 2000, forcedBreakCount: 0 },
+      { index: 1, heightPx: 100, forcedBreakCount: 0 }
     ];
     paginationEngine.computeBreaks(document.createElement('div'));
     fixture.detectChanges();

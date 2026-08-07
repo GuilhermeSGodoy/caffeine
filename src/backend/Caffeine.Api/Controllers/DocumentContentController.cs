@@ -14,7 +14,7 @@ public class DocumentContentController(IDocumentContentRepository repository, IN
 
         if (content is null)
         {
-            return Ok(new DocumentContentDto(nodeId, "{\"type\":\"doc\",\"content\":[]}", 0, 0));
+            return Ok(new DocumentContentDto(nodeId, DocumentContent.DefaultContentJson, 0, 0));
         }
 
         return Ok(ToDto(content));

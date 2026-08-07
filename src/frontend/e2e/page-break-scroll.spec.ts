@@ -45,14 +45,13 @@ async function ensureDebugFolder(request: APIRequestContext): Promise<string> {
   return retryExisting.id;
 }
 
-// Popula pasta/documento/conteúdo direto via API (evita depender de window.prompt na árvore, que
-// bloquearia o teste) e abre o documento na UI real, deixando o cursor pronto no editor.
-async function openDocumentWithContent(
-  page: Page,
+// Cria a pasta/documento direto via API (evita depender de window.prompt na árvore, que
+// bloquearia o teste), sem gravar nenhum conteúdo — reproduz o estado real de um documento que
+// nunca foi salvo (o `GET /api/documents/{id}` cai no fallback default do backend).
+async function createDocumentNode(
   request: APIRequestContext,
-  titleSuffix: string,
-  text: string
-) {
+  titleSuffix: string
+): Promise<{ folderTitle: string; documentTitle: string; documentId: string }> {
   const folderTitle = `Pasta E2E ${titleSuffix}`;
   const documentTitle = `Documento E2E ${titleSuffix}`;
 
@@ -70,15 +69,11 @@ async function openDocumentWithContent(
   expect(documentResponse.ok()).toBeTruthy();
   const document = await documentResponse.json();
 
-  const contentJson = JSON.stringify({
-    type: 'doc',
-    content: [{ type: 'paragraph', content: text ? [{ type: 'text', text }] : [] }]
-  });
-  const saveResponse = await request.put(`${API_BASE_URL}/documents/${document.id}`, {
-    data: { contentJson }
-  });
-  expect(saveResponse.ok()).toBeTruthy();
+  return { folderTitle, documentTitle, documentId: document.id };
+}
 
+// Navega a árvore real da UI até abrir o documento, deixando o cursor pronto no editor.
+async function openInTree(page: Page, folderTitle: string, documentTitle: string) {
   await page.goto('/');
   await expect(page.getByText('Projetos', { exact: true })).toBeVisible();
 
@@ -95,6 +90,35 @@ async function openDocumentWithContent(
   await expect(editorContent).toBeVisible();
 
   return { editorContent, tiptap: page.locator('.editor__page-stack .tiptap') };
+}
+
+// Popula pasta/documento/conteúdo direto via API e abre o documento na UI real.
+async function openDocumentWithContent(
+  page: Page,
+  request: APIRequestContext,
+  titleSuffix: string,
+  text: string
+) {
+  const { folderTitle, documentTitle, documentId } = await createDocumentNode(request, titleSuffix);
+
+  const contentJson = JSON.stringify({
+    type: 'doc',
+    content: [{ type: 'paragraph', content: text ? [{ type: 'text', text }] : [] }]
+  });
+  const saveResponse = await request.put(`${API_BASE_URL}/documents/${documentId}`, {
+    data: { contentJson }
+  });
+  expect(saveResponse.ok()).toBeTruthy();
+
+  return openInTree(page, folderTitle, documentTitle);
+}
+
+// Abre um documento que nunca foi salvo (nenhum PUT feito) — reproduz fielmente o fallback
+// default real do backend, diferente do contentJson sintético usado nos demais testes deste
+// arquivo, que já sempre grava um parágrafo via PUT antes de abrir.
+async function openBrandNewDocument(page: Page, request: APIRequestContext, titleSuffix: string) {
+  const { folderTitle, documentTitle } = await createDocumentNode(request, titleSuffix);
+  return openInTree(page, folderTitle, documentTitle);
 }
 
 // Reproduz o cenário do bug relatado: ao inserir uma quebra manual de página (Ctrl+Enter), a tela
@@ -302,6 +326,47 @@ test('ao inserir quebra manual de página numa página completamente vazia, uma 
     const scrollTop = await editorContent.evaluate((el) => el.scrollTop);
     expect(scrollTop).toBeGreaterThan(scrollTopBeforeBreak);
   }).toPass({ timeout: 5000 });
+});
+
+// Bug relatado após validação manual: o teste acima usa um contentJson sintético (sempre com um
+// parágrafo, gravado via PUT antes de abrir), mas um documento REALMENTE novo nunca teve nenhum
+// PUT — o GET cai no fallback default do backend, que antes da correção retornava um `doc` com
+// `content: []` (zero blocos, nem um parágrafo). Nesse estado degenerado, `tr.split` no atalho
+// Mod-Enter lançava uma exceção síncrona (nenhum textblock para o cursor resolver), e o Ctrl+Enter
+// não fazia nada visível — só o console mostrava o erro. Além disso, mesmo com a página 1 correta,
+// um segundo Ctrl+Enter (ainda com tudo vazio) empilhava outra quebra sobre o MESMO parágrafo, e o
+// medidor de DOM só sinalizava "houve quebra" como booleano, perdendo a contagem — por isso a
+// página 3 nunca aparecia. Este teste cobre as duas causas juntas, do fallback real do backend até
+// duas páginas em branco consecutivas.
+test('num documento nunca salvo, Ctrl+Enter pressionado duas vezes seguidas cria a página 2 e depois a página 3', async ({
+  page,
+  request
+}) => {
+  const { editorContent, tiptap } = await openBrandNewDocument(page, request, `nunca-salvo-${Date.now()}`);
+
+  await tiptap.click();
+  await expect(tiptap).toHaveClass(/ProseMirror-focused/);
+
+  const pageBreaks = tiptap.locator('[data-type="page-break"]');
+  const status = page.locator('.editor__status');
+
+  await expect(status).toContainText('1 páginas');
+
+  await page.keyboard.press('Control+Enter');
+  await expect(pageBreaks).toHaveCount(1);
+  await expect(status).toContainText('2 páginas');
+
+  await waitForSelectionSync(page);
+
+  await page.keyboard.press('Control+Enter');
+  await expect(pageBreaks).toHaveCount(2);
+  await expect(status).toContainText('3 páginas');
+
+  await page.keyboard.type('Texto na página 3.');
+  await expect(tiptap.locator('p').last()).toHaveText('Texto na página 3.');
+
+  const scrollTop = await editorContent.evaluate((el) => el.scrollTop);
+  expect(scrollTop).toBeGreaterThan(0);
 });
 
 // Bug relatado: ao voltar o cursor para uma página que já tem uma página seguinte (com conteúdo) e

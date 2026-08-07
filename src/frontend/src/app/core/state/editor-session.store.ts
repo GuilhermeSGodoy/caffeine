@@ -11,7 +11,7 @@ export class EditorSessionStore {
   private readonly saveRequested = new Subject<void>();
 
   readonly openNodeId = signal<string | null>(null);
-  readonly contentJson = signal<string>('{"type":"doc","content":[]}');
+  readonly contentJson = signal<string>('{"type":"doc","content":[{"type":"paragraph","content":[]}]}');
   readonly wordCount = signal(0);
   readonly charCount = signal(0);
   readonly dirty = signal(false);

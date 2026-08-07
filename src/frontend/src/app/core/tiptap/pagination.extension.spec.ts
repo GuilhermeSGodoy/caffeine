@@ -18,7 +18,7 @@ describe('PaginationExtension', () => {
 
   it('aplica o espaçador como margin-top no primeiro bloco quando a quebra manual é a primeira do documento (página inicial vazia)', async () => {
     paginationEngine = new PaginationEngineService();
-    paginationEngine.blockMeasurer = () => [{ index: 0, heightPx: 50, forcedBreakBefore: true }];
+    paginationEngine.blockMeasurer = () => [{ index: 0, heightPx: 50, forcedBreakCount: 1 }];
 
     editor = new Editor({
       extensions: [StarterKit, PageBreak, PaginationExtension.configure({ paginationEngine })],
@@ -35,8 +35,8 @@ describe('PaginationExtension', () => {
   it('continua aplicando o espaçador como margin-bottom no bloco anterior quando a quebra não é a primeira do documento', async () => {
     paginationEngine = new PaginationEngineService();
     paginationEngine.blockMeasurer = () => [
-      { index: 0, heightPx: 50, forcedBreakBefore: false },
-      { index: 1, heightPx: 50, forcedBreakBefore: true }
+      { index: 0, heightPx: 50, forcedBreakCount: 0 },
+      { index: 1, heightPx: 50, forcedBreakCount: 1 }
     ];
 
     editor = new Editor({
@@ -50,5 +50,21 @@ describe('PaginationExtension', () => {
     expect((paragraphs[0] as HTMLElement).style.marginBottom).not.toBe('');
     expect((paragraphs[1] as HTMLElement).style.marginTop).toBe('');
     expect(paginationEngine.pageCount()).toBe(2);
+  });
+
+  it('escala o espaçador e a contagem de páginas quando há múltiplas quebras manuais consecutivas antes do primeiro bloco', async () => {
+    paginationEngine = new PaginationEngineService();
+    paginationEngine.blockMeasurer = () => [{ index: 0, heightPx: 50, forcedBreakCount: 2 }];
+
+    editor = new Editor({
+      extensions: [StarterKit, PageBreak, PaginationExtension.configure({ paginationEngine })],
+      content: '<div data-type="page-break"></div><div data-type="page-break"></div><p></p>'
+    });
+
+    await flushDecorations();
+
+    const paragraph = editor.view.dom.querySelector('p') as HTMLElement;
+    expect(paragraph.style.marginTop).not.toBe('');
+    expect(paginationEngine.pageCount()).toBe(3);
   });
 });
