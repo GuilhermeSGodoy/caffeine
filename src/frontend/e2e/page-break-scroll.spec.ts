@@ -106,22 +106,29 @@ test('ao inserir quebra manual de página no meio de um parágrafo, o texto rest
   await tiptap.click();
 
   // Posiciona o cursor entre as duas frases via Range nativo, em vez de simular várias teclas de
-  // seta em sequência: o observador de seleção do ProseMirror não é síncrono com o evento nativo,
-  // então uma rajada rápida de ArrowRight (sem tempo de digitação humana entre elas) tende a
-  // deixar o estado interno do editor desincronizado da seleção do DOM — setar a posição final
-  // direto evita essa flakiness.
-  await page.evaluate((offset) => {
-    const textNode = document.querySelector('.editor__page-stack .tiptap p')?.firstChild;
-    if (!textNode) {
-      throw new Error('Nó de texto do primeiro parágrafo não encontrado');
-    }
-    const range = document.createRange();
-    range.setStart(textNode, offset);
-    range.collapse(true);
-    const selection = document.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-  }, firstSentence.length);
+  // seta em sequência (uma rajada rápida de ArrowRight sem tempo de digitação humana entre elas
+  // tende a deixar o estado interno do editor desincronizado da seleção do DOM). Espera o evento
+  // "selectionchange" disparar antes de seguir: ele é assíncrono (fila de tarefas do navegador) —
+  // sem esperar por ele, o ProseMirror ocasionalmente só sincroniza sua seleção interna depois do
+  // Ctrl+Enter já ter sido processado contra a seleção antiga (flakiness observada em CI).
+  await page.evaluate(
+    (offset) =>
+      new Promise<void>((resolve) => {
+        document.addEventListener('selectionchange', () => resolve(), { once: true });
+
+        const textNode = document.querySelector('.editor__page-stack .tiptap p')?.firstChild;
+        if (!textNode) {
+          throw new Error('Nó de texto do primeiro parágrafo não encontrado');
+        }
+        const range = document.createRange();
+        range.setStart(textNode, offset);
+        range.collapse(true);
+        const selection = document.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }),
+    firstSentence.length
+  );
 
   const scrollTopBeforeBreak = await editorContent.evaluate((el) => el.scrollTop);
 
@@ -166,25 +173,20 @@ test('ao inserir quebra manual de página no parágrafo vazio de uma página rec
   await tiptap.click();
   await expect(tiptap).toHaveClass(/ProseMirror-focused/);
 
-  // Posiciona o cursor no fim do texto via Range nativo em vez de Control+End: o observador de
-  // seleção do ProseMirror não é síncrono com o evento nativo de teclado, então essa combinação
-  // seguida de Ctrl+Enter mostrou-se instável (mesma race condition documentada no teste do meio
-  // de parágrafo, abaixo) — setar a posição final diretamente evita essa flakiness.
-  await page.evaluate(() => {
-    const textNode = document.querySelector('.editor__page-stack .tiptap p')?.firstChild;
-    if (!textNode) {
-      throw new Error('Nó de texto do primeiro parágrafo não encontrado');
-    }
-    const range = document.createRange();
-    range.selectNodeContents(textNode);
-    range.collapse(false);
-    const selection = document.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-  });
+  // Posiciona o cursor no fim do texto via Control+End (evento nativo de teclado, que passa pelo
+  // próprio pipeline de seleção do ProseMirror) em vez de um Range manual via page.evaluate: setar
+  // a seleção diretamente no DOM não é reconciliado de forma síncrona pelo ProseMirror antes do
+  // Ctrl+Enter seguinte, causando flakiness (o handler roda contra uma seleção desatualizada).
+  await page.keyboard.press('Control+End');
 
   const pageBreaks = tiptap.locator('[data-type="page-break"]');
   const paragraphs = tiptap.locator('p');
+
+  // Round-trip ao navegador antes do Ctrl+Enter: dá ao ProseMirror uma volta do event loop para
+  // sincronizar a seleção movida pelo Control+End antes do próximo atalho de teclado — sem isso,
+  // o handler do Mod-Enter ocasionalmente roda contra a seleção anterior (flakiness observada em
+  // CI, ver comentário acima sobre o Range manual).
+  await editorContent.evaluate((el) => el.scrollTop);
 
   // Primeira quebra: caminho já existente (parágrafo com texto), cria a página 2 com um parágrafo
   // vazio — ponto de partida para reproduzir o bug relatado.
@@ -213,4 +215,56 @@ test('ao inserir quebra manual de página no parágrafo vazio de uma página rec
     const scrollTop = await editorContent.evaluate((el) => el.scrollTop);
     expect(scrollTop).toBeGreaterThan(scrollTopBeforeSecondBreak);
   }).toPass({ timeout: 5000 });
+});
+
+// Bug relatado: ao voltar o cursor para uma página que já tem uma página seguinte (com conteúdo) e
+// apertar Ctrl+Enter, nenhuma página nova era criada — o cursor apenas pulava para a página
+// seguinte já existente (ver page-break.extension.ts). Este teste garante que uma página nova de
+// fato é inserida entre as duas, sem tocar na página seguinte.
+test('ao inserir quebra manual de página numa página que já tem uma página seguinte, uma página nova é criada entre as duas', async ({
+  page,
+  request
+}) => {
+  const { editorContent, tiptap } = await openDocumentWithContent(
+    page,
+    request,
+    `seguinte-${Date.now()}`,
+    'Conteúdo da página 1.'
+  );
+
+  await tiptap.click();
+  await expect(tiptap).toHaveClass(/ProseMirror-focused/);
+
+  await page.keyboard.press('Control+End');
+  await editorContent.evaluate((el) => el.scrollTop);
+
+  // Cria a página 2 com conteúdo (já não está mais vazia) para reproduzir o cenário do bug.
+  await page.keyboard.press('Control+Enter');
+  await page.keyboard.type('Conteúdo da página 2.');
+
+  const pageBreaks = tiptap.locator('[data-type="page-break"]');
+  const paragraphs = tiptap.locator('p');
+  await expect(pageBreaks).toHaveCount(1);
+  await expect(paragraphs).toHaveCount(2);
+
+  // Volta o cursor para o fim da página 1 (que já tem uma página seguinte com conteúdo).
+  await tiptap.locator('p').first().click();
+  await editorContent.evaluate((el) => el.scrollTop);
+  await page.keyboard.press('End');
+  await editorContent.evaluate((el) => el.scrollTop);
+
+  await page.keyboard.press('Control+Enter');
+
+  // Uma página nova (vazia) é criada entre a página 1 e a página 2 — a página 2 não é tocada nem
+  // reaproveitada como a página nova, apenas empurrada para depois dela.
+  await expect(pageBreaks).toHaveCount(2);
+  await expect(paragraphs).toHaveCount(3);
+  await expect(paragraphs.nth(0)).toHaveText('Conteúdo da página 1.');
+  await expect(paragraphs.nth(1)).toHaveText('');
+  await expect(paragraphs.nth(2)).toHaveText('Conteúdo da página 2.');
+
+  // O cursor fica na página nova (vazia), não na página 2 já existente.
+  await page.keyboard.type('Texto na página nova.');
+  await expect(paragraphs.nth(1)).toHaveText('Texto na página nova.');
+  await expect(paragraphs.nth(2)).toHaveText('Conteúdo da página 2.');
 });
