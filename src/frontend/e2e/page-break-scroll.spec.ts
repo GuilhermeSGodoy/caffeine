@@ -1,6 +1,49 @@
 import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
 
 const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const DEBUG_FOLDER_TITLE = 'Debug';
+
+// Dá ao ProseMirror uma volta do event loop do navegador para sincronizar sua seleção interna após
+// uma ação que move o cursor (clique, tecla de navegação), antes do próximo atalho de teclado —
+// sem isso, o handler do Mod-Enter ocasionalmente roda contra a seleção anterior (flakiness
+// observada em CI e sob carga de CPU/testes em paralelo).
+async function waitForSelectionSync(page: Page): Promise<void> {
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
+
+// Todo dado criado por testes E2E deve nascer dentro da pasta "Debug" (raiz), nunca direto na
+// raiz — evita poluir o menu lateral com dezenas de pastas descartáveis a cada execução da
+// suíte. Reutiliza a pasta se ela já existir (corrida entre specs paralelos é resolvida caindo no
+// fallback de busca abaixo, já que o backend rejeita nome duplicado).
+async function ensureDebugFolder(request: APIRequestContext): Promise<string> {
+  const treeResponse = await request.get(`${API_BASE_URL}/nodes/tree`);
+  expect(treeResponse.ok()).toBeTruthy();
+  const tree: Array<{ id: string; parentId: string | null; title: string }> = await treeResponse.json();
+
+  const existing = tree.find((node) => node.parentId === null && node.title === DEBUG_FOLDER_TITLE);
+  if (existing) {
+    return existing.id;
+  }
+
+  const createResponse = await request.post(`${API_BASE_URL}/nodes`, {
+    data: { parentId: null, nodeType: 0, title: DEBUG_FOLDER_TITLE }
+  });
+  if (createResponse.ok()) {
+    const created = await createResponse.json();
+    return created.id;
+  }
+
+  // Outro spec paralelo criou a pasta "Debug" entre o GET e o POST acima (nome duplicado) — busca
+  // de novo em vez de falhar o teste.
+  const retryTreeResponse = await request.get(`${API_BASE_URL}/nodes/tree`);
+  expect(retryTreeResponse.ok()).toBeTruthy();
+  const retryTree: Array<{ id: string; parentId: string | null; title: string }> = await retryTreeResponse.json();
+  const retryExisting = retryTree.find((node) => node.parentId === null && node.title === DEBUG_FOLDER_TITLE);
+  if (!retryExisting) {
+    throw new Error('Não foi possível criar nem encontrar a pasta "Debug" para os testes E2E.');
+  }
+  return retryExisting.id;
+}
 
 // Popula pasta/documento/conteúdo direto via API (evita depender de window.prompt na árvore, que
 // bloquearia o teste) e abre o documento na UI real, deixando o cursor pronto no editor.
@@ -13,8 +56,10 @@ async function openDocumentWithContent(
   const folderTitle = `Pasta E2E ${titleSuffix}`;
   const documentTitle = `Documento E2E ${titleSuffix}`;
 
+  const debugFolderId = await ensureDebugFolder(request);
+
   const folderResponse = await request.post(`${API_BASE_URL}/nodes`, {
-    data: { parentId: null, nodeType: 0, title: folderTitle }
+    data: { parentId: debugFolderId, nodeType: 0, title: folderTitle }
   });
   expect(folderResponse.ok()).toBeTruthy();
   const folder = await folderResponse.json();
@@ -36,6 +81,10 @@ async function openDocumentWithContent(
 
   await page.goto('/');
   await expect(page.getByText('Projetos', { exact: true })).toBeVisible();
+
+  const debugNode = page.getByRole('treeitem', { name: DEBUG_FOLDER_TITLE, exact: true });
+  await expect(debugNode).toBeVisible();
+  await debugNode.locator('.p-tree-node-toggle-button').click();
 
   const folderNode = page.getByRole('treeitem', { name: folderTitle });
   await expect(folderNode).toBeVisible();
@@ -236,7 +285,7 @@ test('ao inserir quebra manual de página numa página que já tem uma página s
   await expect(tiptap).toHaveClass(/ProseMirror-focused/);
 
   await page.keyboard.press('Control+End');
-  await editorContent.evaluate((el) => el.scrollTop);
+  await waitForSelectionSync(page);
 
   // Cria a página 2 com conteúdo (já não está mais vazia) para reproduzir o cenário do bug.
   await page.keyboard.press('Control+Enter');
@@ -249,9 +298,10 @@ test('ao inserir quebra manual de página numa página que já tem uma página s
 
   // Volta o cursor para o fim da página 1 (que já tem uma página seguinte com conteúdo).
   await tiptap.locator('p').first().click();
-  await editorContent.evaluate((el) => el.scrollTop);
+  await waitForSelectionSync(page);
+
   await page.keyboard.press('End');
-  await editorContent.evaluate((el) => el.scrollTop);
+  await waitForSelectionSync(page);
 
   await page.keyboard.press('Control+Enter');
 
