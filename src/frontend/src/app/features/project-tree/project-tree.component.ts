@@ -158,7 +158,19 @@ export class ProjectTreeComponent implements OnInit {
     }
 
     if (window.confirm(`Excluir "${node.title}" e todo o seu conteúdo?`)) {
+      const openNodeId = this.editorSession.openNodeId();
+      if (openNodeId && this.selectedNode && this.collectIds(this.selectedNode).includes(openNodeId)) {
+        this.editorSession.close();
+      }
       this.store.deleteNode(node.id);
     }
+  }
+
+  private collectIds(node: TreeNode<CaffeineNode>): string[] {
+    const ids = node.data ? [node.data.id] : [];
+    for (const child of node.children ?? []) {
+      ids.push(...this.collectIds(child as TreeNode<CaffeineNode>));
+    }
+    return ids;
   }
 }

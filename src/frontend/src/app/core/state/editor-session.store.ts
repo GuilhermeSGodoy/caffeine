@@ -50,6 +50,15 @@ export class EditorSessionStore {
     this.performSave();
   }
 
+  close(): void {
+    this.openNodeId.set(null);
+    this.contentJson.set('{"type":"doc","content":[{"type":"paragraph","content":[]}]}');
+    this.wordCount.set(0);
+    this.charCount.set(0);
+    this.dirty.set(false);
+    this.saving.set(false);
+  }
+
   private performSave(): void {
     const nodeId = this.openNodeId();
     if (!nodeId || !this.dirty()) {

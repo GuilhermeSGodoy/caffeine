@@ -35,4 +35,17 @@ describe('EditorSessionStore', () => {
     expect(store.wordCount()).toBe(2);
     expect(store.charCount()).toBe(10);
   });
+
+  it('close() limpa a sessão do editor, voltando ao estado inicial', () => {
+    store.open(doc.nodeId);
+    http.expectOne(`${API_BASE_URL}/documents/${doc.nodeId}`).flush(doc);
+    store.onContentChange('{"type":"doc","content":[]}', 'Hello world');
+
+    store.close();
+
+    expect(store.openNodeId()).toBeNull();
+    expect(store.wordCount()).toBe(0);
+    expect(store.charCount()).toBe(0);
+    expect(store.dirty()).toBe(false);
+  });
 });
