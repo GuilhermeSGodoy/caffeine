@@ -10,15 +10,14 @@ description: Use ao concluir o desenvolvimento de uma feature/correção nesta b
 ## Passos
 
 1. **Confirme que não está em `main`** (`git branch --show-current`). Se estiver, algo saiu da ordem — volte ao workflow de `start-feature`.
-2. **Valide localmente antes de abrir o PR** — não abra PR com CI sabidamente quebrado:
+2. **Valide localmente antes de abrir o PR** — apenas builds (rápidos, pegam erro de compilação) e os testes relevantes à mudança feita nesta branch. A suíte completa (unitários + E2E) não é mais exigida localmente — o CI (`.github/workflows/ci.yml`) é a fonte de verdade para isso:
    ```
    dotnet build src/backend/Caffeine.sln
-   dotnet test src/backend/Caffeine.sln
    cd src/frontend
    npx ng build
-   npx ng test --watch=false
    cd ..
    ```
+   Rode só o(s) spec(s)/teste(s) específico(s) do comportamento novo ou corrigido (ex.: `dotnet test --filter ...`, `npx ng test --watch=false --include='**/arquivo.spec.ts'`, ou o novo teste E2E isolado) — não a suíte inteira.
 3. **Atualize o README** se a feature corresponder a um item da seção "Requisitos do Projeto": ajuste o status (🟢/🟡/⚪) e garanta que o link da issue está presente.
 4. **Confirme com o usuário antes de commitar/dar push** — commitar e enviar código para o GitHub são ações que afetam o repositório remoto; siga o padrão de mensagem de commit definido em `CLAUDE.md`: `<tipo>: <descrição> [#<numero-da-issue>]` (ex.: `feat: adiciona busca e substituição de texto [#12]`).
 5. **Dê push da branch**:
