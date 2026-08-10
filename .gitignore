@@ -22,6 +22,12 @@ release/
 *.log
 npm-debug.log*
 
+# Saída bruta de comandos de CI capturada localmente para depuração (ver ci.yml)
+test-output.txt
+test-output-clean.txt
+e2e-output.txt
+e2e-output-clean.txt
+
 # Editor / OS
 .vs/
 .idea/

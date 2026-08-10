@@ -1,14 +1,15 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { Subject, debounceTime } from 'rxjs';
+import { Injectable, OnDestroy, inject, signal } from '@angular/core';
+import { Subject, Subscription, debounceTime } from 'rxjs';
 import { DocumentContentApiService } from '../services/document-content-api.service';
 import { calculateWordCount } from '../utils/word-count.util';
 
 const AUTO_SAVE_DEBOUNCE_MS = 3000;
 
 @Injectable({ providedIn: 'root' })
-export class EditorSessionStore {
+export class EditorSessionStore implements OnDestroy {
   private readonly api = inject(DocumentContentApiService);
   private readonly saveRequested = new Subject<void>();
+  private readonly saveSubscription: Subscription;
 
   readonly openNodeId = signal<string | null>(null);
   readonly contentJson = signal<string>('{"type":"doc","content":[{"type":"paragraph","content":[]}]}');
@@ -18,7 +19,19 @@ export class EditorSessionStore {
   readonly saving = signal(false);
 
   constructor() {
-    this.saveRequested.pipe(debounceTime(AUTO_SAVE_DEBOUNCE_MS)).subscribe(() => this.performSave());
+    this.saveSubscription = this.saveRequested
+      .pipe(debounceTime(AUTO_SAVE_DEBOUNCE_MS))
+      .subscribe(() => this.performSave());
+  }
+
+  ngOnDestroy(): void {
+    // Sem isso, o timer real do debounce (RxJS usa o scheduler assíncrono padrão, não
+    // fake timers) sobrevive à destruição do serviço e dispara depois, chamando a API
+    // através de um injector já destruído — é exatamente o que produzia o NG0205
+    // intermitente na suíte de testes (issue #37). Em produção o serviço nunca é
+    // destruído (providedIn: 'root' vive pela sessão inteira do app), mas isso ainda é
+    // higiene correta para qualquer serviço com subscription própria.
+    this.saveSubscription.unsubscribe();
   }
 
   open(nodeId: string): void {

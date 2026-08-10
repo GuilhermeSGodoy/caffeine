@@ -48,4 +48,24 @@ describe('EditorSessionStore', () => {
     expect(store.charCount()).toBe(0);
     expect(store.dirty()).toBe(false);
   });
+
+  it('ngOnDestroy cancela o auto-save pendente, sem chamar a API depois de destruído', () => {
+    // Regressão da issue #37: o debounce do auto-save usa o scheduler assíncrono padrão do
+    // RxJS (setTimeout real), não fake timers. Sem cancelar a subscription em ngOnDestroy, esse
+    // timer sobrevive à destruição do serviço e dispara depois, chamando a API através de um
+    // injector já destruído — é o que produzia o NG0205 intermitente na suíte completa.
+    vi.useFakeTimers();
+    try {
+      store.open(doc.nodeId);
+      http.expectOne(`${API_BASE_URL}/documents/${doc.nodeId}`).flush(doc);
+      store.onContentChange('{"type":"doc","content":[]}', 'Hello world');
+
+      store.ngOnDestroy();
+      vi.advanceTimersByTime(5000);
+
+      http.expectNone(`${API_BASE_URL}/documents/${doc.nodeId}`);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
