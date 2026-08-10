@@ -23,7 +23,7 @@ jobs:
         shell: pwsh
         run: |
           [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-          dotnet test Caffeine.Tests/Caffeine.Tests.csproj --no-build --configuration Release -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura 2>&1 | Tee-Object -FilePath test-output.txt
+          dotnet test Caffeine.Tests/Caffeine.Tests.csproj --no-build --configuration Release -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura | Tee-Object -FilePath test-output.txt
           $exitCode = $LASTEXITCODE
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Value '### Backend — testes e cobertura (`Caffeine.Domain`)'
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Value '```text'
@@ -53,7 +53,7 @@ jobs:
           {
             echo '### Frontend — cobertura'
             echo '```text'
-            awk '/Coverage report from/,/^=+$/' test-output-clean.txt
+            awk '/Coverage report from/,0' test-output-clean.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           exit "$exit_code"
