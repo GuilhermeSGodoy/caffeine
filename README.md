@@ -92,6 +92,7 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Scrollar pro topo ao abrir um documento.
 - Largura ajustável do menu lateral.
 - Configurações: seletor de tema fecha ao fechar as configurações.
+- Contagem de caracteres/palavras/páginas: quando tiver apenas um, usar a palavra no singular.
 - Avançado: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo). Avaliar a criação de estruturas diferentes de documento: um sem a adição de capítulos internos, e outro em que o documento principal serve como uma estrutura para unir os capítulos internos num único documento, conforme preferência do usuário (possibilidade de usar drag-and-drop para a organização do conteúdo).
 
 ### Fase 2
