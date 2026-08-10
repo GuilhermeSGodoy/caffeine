@@ -12,12 +12,14 @@ description: Use ao concluir o desenvolvimento de uma feature/correção nesta b
 1. **Confirme que não está em `main`** (`git branch --show-current`). Se estiver, algo saiu da ordem — volte ao workflow de `start-feature`.
 2. **Valide localmente antes de abrir o PR** — apenas builds (rápidos, pegam erro de compilação) e os testes relevantes à mudança feita nesta branch. A suíte completa (unitários + E2E) não é mais exigida localmente — o CI (`.github/workflows/ci.yml`) é a fonte de verdade para isso:
    ```
-   dotnet build src/backend/Caffeine.sln
+   dotnet build src/backend/Caffeine.slnx
    cd src/frontend
    npx ng build
    cd ..
    ```
-   Rode só o(s) spec(s)/teste(s) específico(s) do comportamento novo ou corrigido (ex.: `dotnet test --filter ...`, `npx ng test --watch=false --include='**/arquivo.spec.ts'`, ou o novo teste E2E isolado) — não a suíte inteira.
+   Builds continuam rodados diretamente (rápidos, não precisam de subagente). Para os testes, use os subagentes dedicados em vez de rodar/escrever manualmente:
+   - Invoque o subagente **`test-writer`** apontando o diff da branch (`git diff main...HEAD`) para revisar lacunas de teste do comportamento novo/corrigido. Ele só preenche lacunas reais — não substitui o teste principal já escrito durante a implementação. Se ele adicionar casos, eles entram no mesmo diff que vai para o PR.
+   - Invoque o subagente **`test-runner`** passando os specs/filtros relevantes a esta branch (ex.: `dotnet test --filter ...`, `npx ng test --watch=false --include='**/arquivo.spec.ts'`, ou o novo teste E2E isolado) para executá-los e resumir o resultado — não peça a ele para rodar a suíte inteira.
 3. **Atualize o README** se a feature corresponder a um item da seção "Requisitos do Projeto": ajuste o status (🟢/🟡/⚪) e garanta que o link da issue está presente.
 4. **Confirme com o usuário antes de commitar/dar push** — commitar e enviar código para o GitHub são ações que afetam o repositório remoto; siga o padrão de mensagem de commit definido em `CLAUDE.md`: `<tipo>: <descrição> [#<numero-da-issue>]` (ex.: `feat: adiciona busca e substituição de texto [#12]`).
 5. **Dê push da branch**:

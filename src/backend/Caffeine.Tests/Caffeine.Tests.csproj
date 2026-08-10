@@ -7,8 +7,28 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <!--
+    Gate de cobertura mínima usado no CI (.github/workflows/ci.yml), acionado via
+    `dotnet test -p:CollectCoverage=true`. Escopo intencionalmente restrito a
+    Caffeine.Domain: é a única camada do backend coberta por teste unitário puro
+    (sem EF Core) por convenção do CLAUDE.md. Caffeine.Infrastructure (repositórios,
+    DbContext, migrations) fica de fora do Include — hoje não tem teste de
+    integração, e travar nela produziria um alvo arbitrário em vez de um piso real
+    de qualidade. Os valores ficam aqui (em vez de flags de linha de comando) porque
+    o dotnet CLI quebra o parsing de `-p:ThresholdType=line,branch` quando passado
+    diretamente na linha de comando (a vírgula é interpretada como separador de
+    propriedades).
+  -->
+  <PropertyGroup Condition="'$(CollectCoverage)' == 'true'">
+    <Include>[Caffeine.Domain]*</Include>
+    <Threshold>80</Threshold>
+    <ThresholdType>line,branch</ThresholdType>
+    <ThresholdStat>total</ThresholdStat>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="coverlet.msbuild" Version="6.0.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />

@@ -20,6 +20,8 @@ jobs:
       - run: dotnet restore
       - run: dotnet build --no-restore --configuration Release
       - run: dotnet test --no-build --configuration Release
+      - name: Gate de cobertura (Caffeine.Domain)
+        run: dotnet test Caffeine.Tests/Caffeine.Tests.csproj --no-build --configuration Release -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura
 
   frontend:
     runs-on: ubuntu-latest
