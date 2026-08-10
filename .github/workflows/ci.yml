@@ -36,6 +36,8 @@ jobs:
       - run: npm ci
       - run: npx ng build
       - run: npx ng test --watch=false
+      - name: Gate de cobertura
+        run: npx ng test --watch=false --configuration=ci
 
   e2e:
     runs-on: ubuntu-latest
