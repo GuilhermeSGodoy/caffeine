@@ -94,6 +94,9 @@ Cada item concluído ou em andamento é linkado à issue do GitHub que rastreou 
 - Configurações: seletor de tema fecha ao fechar as configurações.
 - Contagem de caracteres/palavras/páginas: quando tiver apenas um, usar a palavra no singular.
 - Avançado: navegação inteligente dentro do documento (ex: pular para um título/seção específico dentro de um capítulo longo). Avaliar a criação de estruturas diferentes de documento: um sem a adição de capítulos internos, e outro em que o documento principal serve como uma estrutura para unir os capítulos internos num único documento, conforme preferência do usuário (possibilidade de usar drag-and-drop para a organização do conteúdo).
+- 🟢 Subagentes dedicados de teste (`test-writer`/`test-runner`, em `.claude/agents/`) integrados ao `finish-feature`, e gate de cobertura mínima (80% linha/branch) no CI para `Caffeine.Domain` ([#36](https://github.com/GuilhermeSGodoy/caffeine/issues/36))
+  - `test-runner` executa specs/filtros indicados e resume o resultado; `test-writer` revisa o diff de uma branch em busca de lacunas de teste, sem substituir o teste principal escrito durante a implementação. Infraestrutura de cobertura do frontend (`@vitest/coverage-v8`, configuração `ci` em `angular.json`) também pronta, mas com o gate ainda não ativado no CI — ver item abaixo.
+- Bug `NG0205` (injector destruído): só aparece ao rodar a suíte completa do frontend com cobertura habilitada (`--coverage`), mesmo com todos os testes passando — bloqueia habilitar o gate de cobertura do frontend no CI ([#37](https://github.com/GuilhermeSGodoy/caffeine/issues/37))
 
 ### Fase 2
 
@@ -154,7 +157,7 @@ Cada parte do projeto tem seu próprio gerenciador de dependências. Rode a part
 
 ```powershell
 # Backend (.NET) — restaura os pacotes NuGet
-dotnet restore src/backend/Caffeine.sln
+dotnet restore src/backend/Caffeine.slnx
 
 # Frontend (Angular)
 cd src/frontend
@@ -200,7 +203,7 @@ O banco SQLite de desenvolvimento fica em `.devdata/caffeine.db` (ignorado pelo 
 
 ```powershell
 # Testes do backend (xUnit)
-dotnet test src/backend/Caffeine.sln
+dotnet test src/backend/Caffeine.slnx
 
 # Testes do frontend (Vitest)
 cd src/frontend
@@ -208,6 +211,13 @@ npx ng test --watch=false
 
 # Testes E2E do frontend (Playwright) — exige backend e frontend de dev já rodando
 npm run e2e
+
+# Cobertura de código
+dotnet test src/backend/Caffeine.Tests/Caffeine.Tests.csproj -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura
+cd src/frontend
+npx ng test --watch=false --coverage
 ```
 
 Testes E2E (Playwright) validam layout/DOM real de navegador (Chromium), algo que os specs Angular/Vitest não conseguem — eles rodam em jsdom, onde `getBoundingClientRect` sempre retorna 0. Use Playwright para bugs de renderização/CSS que dependam de medição real de layout; specs Vitest continuam sendo a validação padrão para lógica de componentes/serviços.
+
+O CI (`.github/workflows/ci.yml`) já aplica um gate de cobertura mínima (80% linha/branch) sobre `Caffeine.Domain` — a única camada do backend com teste unitário puro por convenção (ver `CLAUDE.md`); `Caffeine.Infrastructure` fica fora por não ter teste de integração hoje. O gate equivalente do frontend está pronto mas bloqueado por [#37](https://github.com/GuilhermeSGodoy/caffeine/issues/37) (ver "Demandas adicionais" da Fase 1).
