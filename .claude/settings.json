@@ -16,6 +16,18 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session-compact-context.js",
+            "statusMessage": "Reancorando estado do projeto após compactação..."
+          }
+        ]
+      }
     ]
   }
 }

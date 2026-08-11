@@ -10,35 +10,15 @@ Antes de propor uma feature nova, confira a seção "Requisitos do Projeto" do R
 
 ## Arquitetura
 
-- **Backend** (`src/backend`, .NET): Clean Architecture pragmática em 4 projetos — `Caffeine.Domain` (entidades e regras de negócio puras, sem EF Core), `Caffeine.Infrastructure` (EF Core + SQLite, repositórios, integrações externas como QuestPDF), `Caffeine.Api` (controllers finos, DI, Program.cs), `Caffeine.Tests` (xUnit). Não introduza uma camada `Application`/CQRS/MediatR — não se justifica para este escopo (app desktop single-user).
-- **Frontend** (`src/frontend`, Angular): standalone components organizados por feature em `src/app/features/*`, serviços/estado compartilhado em `src/app/core/*`. Estado usa **Angular Signals nativos** (`signal()`/`computed()` em serviços) — não introduza NgRx. UI com PrimeNG, editor de texto com Tiptap.
-- **Electron** (`src/electron`): em produção, spawna o backend self-contained como subprocesso local e descobre a porta dinâmica via stdout (`PORT=<n>`); em dev, o backend roda separadamente em porta fixa (`5000`) e o Electron não o gerencia.
-
-Motivo de cada decisão está registrado no histórico de commits e no README — não redecida a arquitetura sem necessidade real.
+@.claude/conventions/architecture.md
 
 ## Convenções e boas práticas já em uso
 
-- **Domínio testável sem banco**: regras de negócio (validação de hierarquia de nós, cálculo de contagem de palavras, extração de texto de JSON do Tiptap) vivem em `Caffeine.Domain` como funções/classes estáticas puras, testadas com xUnit sem qualquer dependência de EF Core. Ao adicionar uma regra de negócio nova, siga esse padrão — não a esconda dentro de um controller ou de EF queries.
-- **Migrations EF Core**: qualquer mudança de entidade em `Caffeine.Infrastructure` precisa de uma migration correspondente (`dotnet ef migrations add <Nome> --project src/backend/Caffeine.Infrastructure --startup-project src/backend/Caffeine.Api -o Data/Migrations`). As migrations são aplicadas automaticamente no startup do backend (`dbContext.Database.Migrate()`), então nunca é necessário rodar `dotnet ef database update` manualmente em dev.
-- **Soft delete + cascade manual**: `Node` usa `IsDeleted` (query filter global), não exclusão física. Ao excluir um nó, os descendentes precisam ser marcados como excluídos explicitamente — e como o `GetTreeAsync` usa `AsNoTracking()` por performance, qualquer alteração em lote precisa buscar as entidades novamente com tracking (via `GetByIdAsync`) antes de salvar. Esse é um bug real que já ocorreu neste projeto — tome cuidado ao reutilizar entidades vindas de queries `AsNoTracking`.
-- **Testes de domínio antes de infraestrutura**: ao implementar uma regra nova, escreva o teste unitário do `Caffeine.Domain` correspondente antes ou junto da implementação — não deixe para depois.
-- **Teste automatizado obrigatório em toda feature/correção**: tanto backend (xUnit em `Caffeine.Tests`) quanto frontend (specs Angular/Vitest) — cobrindo o comportamento novo ou o bug corrigido, não só passando pelos testes existentes. Se o bug só se manifesta numa camada específica (ex.: perda de estado de UI, race condition), o teste deve reproduzir esse cenário nessa camada (ex.: um spec do serviço/store), mesmo que a causa raiz esteja em como uma biblioteca de terceiros é usada — isso evita regressão futura e documenta o comportamento esperado.
-- **CORS**: a origem do frontend em dev (`http://localhost:4200`) está fixa em `Program.cs`. Se a porta do `ng serve` mudar, ajuste a policy de CORS.
-- **Cross-platform lockfiles**: se o CI do frontend falhar no `npm ci` com "package.json e package-lock.json fora de sincronia" ou "Missing: @emnapi/..." (inconsistência conhecida de lockfile gerado no Windows) — ver skill `fix-frontend-lockfile`.
-- **Orçamento de bundle do Angular**: foi ampliado em `angular.json` (de 500kB/1MB para 1MB/2MB) por causa do peso de PrimeNG + Tiptap. Se for aumentar mais, prefira antes investigar lazy loading de features — não apenas suba o limite de novo sem necessidade.
-- **Atualizar CLAUDE.md, Hooks e Skills conforme a necessidade do projeto, visando melhorias no fluxo de trabalho**
+@.claude/conventions/code-style.md
 
 ## Workflow de desenvolvimento (Git/GitHub)
 
-**Antes de editar qualquer arquivo de código para uma feature ou correção nova**, toda demanda começa com uma issue no GitHub e uma branch a partir de `main` (`feature/<numero>` ou `bugfix/<numero>`) — isso vale mesmo que o pedido pareça pequeno ou já diagnosticado em conversa. Use a skill `start-feature` para automatizar isso; não pule direto para a implementação. Use a skill `finish-feature` para validar, dar push e abrir o PR ao concluir.
-
-Regras que valem independentemente de qual skill estiver em uso:
-
-- Nunca commite ou faça push direto em `main` (bloqueado por hook) e nunca faça merge de PR sem revisão do usuário.
-- Commit: `<tipo>: <descrição> [#<numero-da-issue>]`, uma única linha, sem corpo/parágrafo explicativo — validado automaticamente por hook (ex.: `feat: adiciona busca e substituição de texto [#12]`).
-- Merge de PR aprovado é sempre **merge normal** (merge commit) — nunca squash nem rebase.
-- README: ao concluir/avançar um item de "Requisitos do Projeto", "Bugs identificados" ou "Demandas adicionais", marque 🟢/🟡 e linke a issue — nunca remova a linha.
-- CI (`.github/workflows/ci.yml`, build+test de backend, frontend e E2E) é a fonte de verdade da suíte completa — acompanhe o resultado no PR em vez de rodar tudo de novo localmente.
+@.claude/conventions/git-workflow.md
 
 ## Validação antes de considerar algo pronto
 

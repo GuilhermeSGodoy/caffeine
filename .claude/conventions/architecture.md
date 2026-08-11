@@ -1,0 +1,5 @@
+- **Backend** (`src/backend`, .NET): Clean Architecture pragmática em 4 projetos — `Caffeine.Domain` (entidades e regras de negócio puras, sem EF Core), `Caffeine.Infrastructure` (EF Core + SQLite, repositórios, integrações externas como QuestPDF), `Caffeine.Api` (controllers finos, DI, Program.cs), `Caffeine.Tests` (xUnit). Não introduza uma camada `Application`/CQRS/MediatR — não se justifica para este escopo (app desktop single-user).
+- **Frontend** (`src/frontend`, Angular): standalone components organizados por feature em `src/app/features/*`, serviços/estado compartilhado em `src/app/core/*`. Estado usa **Angular Signals nativos** (`signal()`/`computed()` em serviços) — não introduza NgRx. UI com PrimeNG, editor de texto com Tiptap.
+- **Electron** (`src/electron`): em produção, spawna o backend self-contained como subprocesso local e descobre a porta dinâmica via stdout (`PORT=<n>`); em dev, o backend roda separadamente em porta fixa (`5000`) e o Electron não o gerencia.
+
+Motivo de cada decisão está registrado no histórico de commits e no README — não redecida a arquitetura sem necessidade real.

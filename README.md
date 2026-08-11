@@ -14,8 +14,7 @@
   - ASP.NET Core Web API: framework backend
   - Entity Framework Core: ORM
   - QuestPDF: exportação em PDF
-  - Docker: contêineres p/ backend, banco de dados p/ desenvolvimento
-  - Electon: geração de pacotes executáveis do app desktop
+  - Electron: geração de pacotes executáveis do app desktop
 
 ## Requisitos do Projeto
 
