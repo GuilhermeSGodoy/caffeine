@@ -7,3 +7,4 @@ Regras que valem independentemente de qual skill estiver em uso:
 - Merge de PR aprovado é sempre **merge normal** (merge commit) — nunca squash nem rebase.
 - README: ao concluir/avançar um item de "Requisitos do Projeto", "Bugs identificados" ou "Demandas adicionais", marque 🟢/🟡 e linke a issue — nunca remova a linha.
 - CI (`.github/workflows/ci.yml`, build+test de backend, frontend e E2E) é a fonte de verdade da suíte completa — acompanhe o resultado no PR em vez de rodar tudo de novo localmente.
+- Após uma compactação de contexto, um hook (`.claude/hooks/session-compact-context.js`) reancora automaticamente branch atual, alerta se é `main` e status de mudanças não commitadas — não é preciso perguntar isso de novo ao usuário nesse momento, a informação já chega via `SessionStart`.
