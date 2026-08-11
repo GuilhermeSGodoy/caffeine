@@ -34,7 +34,7 @@ process.stdin.on('end', () => {
         hookEventName: 'PreToolUse',
         permissionDecision: 'deny',
         permissionDecisionReason:
-          'Commit/push direto na branch "main" está bloqueado neste projeto. Crie uma branch a partir de uma issue (ex.: "12-nome-da-feature") e trabalhe nela — veja o workflow de Git/GitHub descrito em CLAUDE.md.'
+          'Commit/push direto na branch "main" está bloqueado neste projeto. Crie uma branch a partir de uma issue (ex.: "feature/12" ou "bugfix/12") e trabalhe nela — veja o workflow de Git/GitHub descrito em CLAUDE.md.'
       }
     })
   );

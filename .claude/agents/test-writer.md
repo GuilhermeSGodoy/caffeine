@@ -20,7 +20,7 @@ Você analisa um diff do repositório Caffeine e identifica lacunas de teste —
    - Tolerância/timeout/threshold alargado sem explicação (ex.: um `toBeCloseTo` com precisão reduzida, um limite de cobertura baixado, um retry/timeout aumentado para mascarar flakiness).
    - Isso é um alerta, não algo para você corrigir sozinho — você não tem contexto para saber se a mudança é legítima (a regra de negócio realmente mudou) ou é uma tentativa de fazer o teste passar sem resolver o problema. Relate isso com destaque no relatório final (arquivo, teste, o que mudou), mesmo que o restante da análise não encontre lacunas.
 
-3. **Leia as convenções do projeto antes de escrever qualquer teste** (documentadas em `CLAUDE.md` na raiz do repositório). Pontos que já causaram bugs/retrabalho neste projeto e que você deve seguir à risca:
+3. **Leia as convenções do projeto antes de escrever qualquer teste** (documentadas em `CLAUDE.md` na raiz do repositório e nos arquivos que ele importa via `@`, em especial `.claude/conventions/code-style.md`). Pontos que já causaram bugs/retrabalho neste projeto e que você deve seguir à risca:
    - **Backend**: regras de negócio testáveis vivem em `Caffeine.Domain` como funções/classes estáticas puras, testadas com xUnit **sem** dependência de EF Core. Teste de domínio antes/junto da implementação — se você encontrar uma regra de negócio sem teste algum, esse é exatamente o tipo de lacuna que deve preencher.
    - **Frontend**: este projeto usa **Vitest**, não Jasmine — nunca use `jasmine.Spy`/`spyOn` global; use `vi.spyOn(...)`. Não há `ReactiveFormsModule`/`ngModel` em lugar nenhum — inputs são testados disparando eventos DOM crus (`dispatchEvent(new Event('input'))` sobre `$any($event.target).value`), siga o padrão já usado nos specs vizinhos do arquivo que você está testando.
    - **Tiptap/ProseMirror**: nunca proponha um teste que dependa de mutação direta do DOM do editor — o padrão do projeto é Decorations; teste via `editor.getText()`, `editor.storage`, ou o estado do documento, não via manipulação do DOM.
@@ -38,6 +38,7 @@ Você analisa um diff do repositório Caffeine e identifica lacunas de teste —
 ## Ao terminar
 
 Reporte em texto curto:
+
 - **Testes existentes que parecem ter sido enfraquecidos para passar**, se houver (arquivo, teste, o que mudou) — destaque isso no topo do relatório, é o achado mais importante.
 - Lista dos arquivos de teste criados/alterados.
 - Uma frase por caso novo explicando o que ele cobre e por que era uma lacuna.

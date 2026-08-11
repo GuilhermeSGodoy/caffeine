@@ -1,0 +1,9 @@
+{
+  "config": {
+    "default": true,
+    // Este projeto usa parágrafo em linha única (sem quebra manual em 80 colunas),
+    // convenção já adotada em CLAUDE.md/README.md — MD013 geraria ruído generalizado.
+    "MD013": false
+  },
+  "ignores": ["node_modules", "dist", "**/bin/**", "**/obj/**"]
+}
