@@ -10,14 +10,14 @@ Ver [reference.md](reference.md) para a causa raiz e por que isso se repete.
 ## Passos
 
 1. Apague `node_modules` e `package-lock.json` em `src/frontend` e rode `npm install` limpo:
-   ```
+   ```powershell
    cd src/frontend
-   rm -rf node_modules package-lock.json
+   Remove-Item -Recurse -Force node_modules, package-lock.json
    npm install
    ```
 2. Confirme com `npm ci` limpo localmente antes de commitar o lockfile:
-   ```
-   rm -rf node_modules
+   ```powershell
+   Remove-Item -Recurse -Force node_modules
    npm ci
    ```
 3. **Mesmo com o passo 2 passando**, confira diretamente no `package-lock.json` se as entradas
