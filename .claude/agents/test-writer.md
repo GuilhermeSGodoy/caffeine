@@ -38,6 +38,7 @@ Você analisa um diff do repositório Caffeine e identifica lacunas de teste —
 ## Ao terminar
 
 Reporte em texto curto:
+
 - **Testes existentes que parecem ter sido enfraquecidos para passar**, se houver (arquivo, teste, o que mudou) — destaque isso no topo do relatório, é o achado mais importante.
 - Lista dos arquivos de teste criados/alterados.
 - Uma frase por caso novo explicando o que ele cobre e por que era uma lacuna.

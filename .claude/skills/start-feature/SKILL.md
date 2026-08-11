@@ -11,10 +11,12 @@ Workflow deste repositório (ver `CLAUDE.md`): toda feature/correção começa c
 
 1. **Confirme o escopo com o usuário** se ainda não estiver claro (o que será feito, qual requisito do README ela atende ou qual gap/bug ela resolve).
 2. **Garanta que está em `main` atualizada**:
-   ```
+
+   ```sh
    git checkout main
    git pull
    ```
+
 3. **Crie a issue no GitHub** usando a estrutura do template em `.github/ISSUE_TEMPLATE/feature.md` (ou `bug.md` se for uma correção). Preencha Contexto, Escopo, Critérios de aceite e Tarefas técnicas com base no que foi discutido com o usuário — não deixe os placeholders do template.
    - `gh` (GitHub CLI) está instalado nesta máquina. Use `gh issue create --repo <owner>/<repo> --title "..." --label bug --body "..."`.
    - **Se a sessão de shell não reconhecer `gh`** (PATH não recarregado após instalação — ex.: `command not found` no Git Bash mesmo com `gh` instalado): use o caminho completo do executável, `"/c/Program Files/GitHub CLI/gh.exe"`.
@@ -22,13 +24,17 @@ Workflow deste repositório (ver `CLAUDE.md`): toda feature/correção começa c
    - **Como último recurso**, se `gh` genuinamente não estiver disponível: requisição HTTP autenticada à API do GitHub (`POST /repos/<owner>/<repo>/issues`) com esse mesmo token via `Authorization: token <token>`. Prefira **PowerShell** (`Invoke-RestMethod` + `ConvertTo-Json`) em vez de Bash+curl neste ambiente Windows — não há `jq`/`python3` instalados, e paths POSIX/backticks quebram facilmente ao montar o JSON manualmente em Git Bash.
    - Retenha o número da issue criada.
 4. **Crie e faça checkout da branch** a partir de `main`, nomeada `feature/<numero-da-issue>` (feature) ou `bugfix/<numero-da-issue>` (correção):
-   ```
+
+   ```sh
    git checkout -b feature/<numero>
    ```
+
    ou
-   ```
+
+   ```sh
    git checkout -b bugfix/<numero>
    ```
+
 5. **Comece a implementar** seguindo as convenções de `CLAUDE.md` (testes de domínio, migrations, mensagens de commit no formato `<tipo>: <descrição> [#<numero>]`, etc).
 
 ## Observação sobre o hook de proteção

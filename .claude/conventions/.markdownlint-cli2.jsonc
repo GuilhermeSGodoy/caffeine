@@ -1,0 +1,7 @@
+{
+  "config": {
+    // Estes arquivos são fragmentos importados via @ dentro de uma seção do
+    // CLAUDE.md (não são documentos autônomos) — não devem ter H1 próprio.
+    "MD041": false
+  }
+}

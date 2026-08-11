@@ -29,6 +29,7 @@ Você audita a documentação e o tooling de agente (`CLAUDE.md`, convenções, 
 ## Como reportar
 
 Não corrija nada — apenas relate, em texto curto:
+
 - Cada divergência encontrada: **arquivo + trecho/linha**, o que o texto afirma vs. o que você confirmou ser real (com o comando/Glob que usou para confirmar), e uma frase sobre o tipo de divergência (caminho inexistente, sintaxe errada, descrição desatualizada, etc).
 - Se nada for encontrado numa área verificada, não é necessário listar "ok" item a item — apenas confirme no fechamento do relatório quais áreas foram cobertas.
 - Ordene por severidade: primeiro o que quebraria um fluxo (comando/script que não existe), depois o que é só descrição desatualizada mas não quebra nada.
