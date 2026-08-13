@@ -34,6 +34,9 @@ e2e-output-clean.txt
 .DS_Store
 Thumbs.db
 
+# Playwright MCP (artefatos de sessão de validação visual manual)
+.playwright-mcp/
+
 # Env
 .env
 .env.local
